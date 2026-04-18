@@ -28,6 +28,18 @@ const PAGE_SUGGESTIONS: Record<string, { label: string; query: string }[]> = {
     { label: "Show my hottest leads",              query: "Show my hottest leads" },
     { label: "What jobs are waiting on me?",       query: "What jobs are waiting on me?" },
   ],
+  "/demo/agency": [
+    { label: "Analyze pipeline",                   query: "Analyze my pipeline" },
+    { label: "Draft outreach",                     query: "Draft outreach for my top leads" },
+    { label: "Generate tasks",                     query: "Generate follow-up tasks from my pipeline" },
+    { label: "Recommend automations",              query: "Recommend automations for my workflow" },
+  ],
+  "/demo/client": [
+    { label: "Who needs a follow-up today?",       query: "Who do I need to follow up with today?" },
+    { label: "Write a reply for a lead",           query: "Write a text reply for my top lead" },
+    { label: "Show my hottest leads",              query: "Show my hottest leads" },
+    { label: "What jobs are waiting on me?",       query: "What jobs are waiting on me?" },
+  ],
   "/demo/leads": [
     { label: "Show my hottest leads",              query: "Show my hottest leads" },
     { label: "Write a follow-up text",             query: "Write a text reply for Jessica Kim about her roof estimate" },
@@ -98,6 +110,8 @@ const PAGE_SUGGESTIONS: Record<string, { label: string; query: string }[]> = {
 
 const PAGE_GREETINGS: Record<string, string> = {
   "/demo":            "Hey Jordan! You have 4 follow-ups due today and 12 new leads. What would you like help with?",
+  "/demo/agency":     "I can see your full system. What would you like me to do?",
+  "/demo/client":     "Hey Jordan! You have 4 follow-ups due today and 12 new leads. What would you like help with?",
   "/demo/leads":      "I can see your 10 leads. 3 quotes haven't been answered in 5+ days — want me to write follow-up texts?",
   "/demo/messages":   "You have 2 unread messages. Dave Mitchell just asked about roof availability. Want me to draft a reply?",
   "/demo/jobs":       "You have 13 jobs across 6 stages. 3 estimates haven't had a response — should I follow up?",

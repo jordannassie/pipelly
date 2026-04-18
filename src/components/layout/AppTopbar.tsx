@@ -8,6 +8,8 @@ import { useAICopilot } from "@/lib/ai-copilot-context";
 
 const PAGE_META: Record<string, { title: string; breadcrumb: string[] }> = {
   "/demo":              { title: "Home",          breadcrumb: [] },
+  "/demo/agency":       { title: "Home",          breadcrumb: [] },
+  "/demo/client":       { title: "Home",          breadcrumb: [] },
   "/demo/leads":        { title: "Leads",         breadcrumb: ["Leads"] },
   "/demo/messages":     { title: "Messages",      breadcrumb: ["Messages"] },
   "/demo/jobs":         { title: "Jobs",          breadcrumb: ["Jobs"] },
@@ -27,6 +29,8 @@ const PAGE_META: Record<string, { title: string; breadcrumb: string[] }> = {
 const AI_HINTS: Record<"agency" | "client", Record<string, string>> = {
   agency: {
     "/demo":             "What should I focus on today?",
+    "/demo/agency":      "What should I focus on today?",
+    "/demo/client":      "Who needs a follow-up today?",
     "/demo/workspaces":  "Create a new workspace",
     "/demo/leads":       "Score leads with AI",
     "/demo/pipeline":    "Why are deals stuck?",
@@ -39,6 +43,8 @@ const AI_HINTS: Record<"agency" | "client", Record<string, string>> = {
   },
   client: {
     "/demo":             "Who needs a follow-up today?",
+    "/demo/client":      "Who needs a follow-up today?",
+    "/demo/agency":      "What should I focus on today?",
     "/demo/leads":       "Show my hottest leads",
     "/demo/messages":    "Write a text reply",
     "/demo/jobs":        "What jobs are waiting on me?",

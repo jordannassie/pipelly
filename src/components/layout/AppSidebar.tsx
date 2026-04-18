@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { useDashboardMode } from "@/lib/dashboard-mode-context";
 
 const agencyNav = [
-  { label: "Home",        href: "/demo",             icon: LayoutDashboard },
+  { label: "Home",        href: "/demo/agency",      icon: LayoutDashboard },
   { label: "Workspaces",  href: "/demo/workspaces",  icon: Building2 },
   { label: "Leads",       href: "/demo/leads",       icon: Users2 },
   { label: "Pipeline",    href: "/demo/pipeline",    icon: GitBranch },
@@ -35,7 +35,7 @@ const agencyNav = [
 ];
 
 const clientNav = [
-  { label: "Home",     href: "/demo",          icon: LayoutDashboard },
+  { label: "Home",     href: "/demo/client",   icon: LayoutDashboard },
   { label: "Leads",    href: "/demo/leads",    icon: Users2 },
   { label: "Messages", href: "/demo/messages", icon: MessageSquare },
   { label: "Jobs",     href: "/demo/jobs",     icon: Briefcase },
@@ -50,14 +50,15 @@ export function AppSidebar() {
   const nav = mode === "agency" ? agencyNav : clientNav;
 
   const isActive = (href: string) => {
-    if (href === "/demo") return pathname === "/demo";
+    if (href === "/demo/agency") return pathname === "/demo/agency";
+    if (href === "/demo/client") return pathname === "/demo/client";
     return pathname.startsWith(href);
   };
 
   const handleModeSwitch = (newMode: "agency" | "client") => {
     if (newMode === mode) return;
     setMode(newMode);
-    router.push("/demo");
+    router.push(newMode === "agency" ? "/demo/agency" : "/demo/client");
   };
 
   return (
