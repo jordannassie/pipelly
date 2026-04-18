@@ -1,203 +1,175 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Plus, Sparkles, Phone, MessageSquare, ChevronRight } from "lucide-react";
-import { mockLiteLeads, type LiteLeadStatus, type LiteLead } from "@/lib/mock-data";
-import { cn } from "@/lib/utils";
+import { Search, Sparkles, PenLine, Upload, Plus } from "lucide-react";
+import { mockLeads } from "@/lib/mock-data";
+import { LeadTable } from "@/components/leads/LeadTable";
+import type { LeadStatus } from "@/lib/types";
 import { useAICopilot } from "@/lib/ai-copilot-context";
-import Link from "next/link";
 
-const STATUSES: { value: LiteLeadStatus | "all"; label: string }[] = [
-  { value: "all",        label: "All Leads" },
-  { value: "new",        label: "New" },
-  { value: "contacted",  label: "Contacted" },
-  { value: "quote-sent", label: "Quote Sent" },
-  { value: "booked",     label: "Booked" },
-  { value: "closed",     label: "Closed" },
+const SEGMENT_TABS: { label: string; value: LeadStatus | "all" }[] = [
+  { label: "All Leads", value: "all" },
+  { label: "New", value: "new" },
+  { label: "Contacted", value: "contacted" },
+  { label: "Qualified", value: "qualified" },
+  { label: "Nurturing", value: "nurturing" },
 ];
-
-const STATUS_STYLE: Record<string, { label: string; color: string }> = {
-  "new":        { label: "New",        color: "bg-blue-50 text-blue-700" },
-  "contacted":  { label: "Contacted",  color: "bg-amber-50 text-amber-700" },
-  "quote-sent": { label: "Quote Sent", color: "bg-violet-50 text-violet-700" },
-  "booked":     { label: "Booked",     color: "bg-emerald-50 text-emerald-700" },
-  "closed":     { label: "Closed",     color: "bg-gray-100 text-gray-500" },
-};
 
 export default function LeadsPage() {
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<LiteLeadStatus | "all">("all");
+  const [activeTab, setActiveTab] = useState<LeadStatus | "all">("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sourceFilter, setSourceFilter] = useState("all");
+  const [ownerFilter, setOwnerFilter] = useState("all");
   const { openWithQuery } = useAICopilot();
 
-  const filtered = mockLiteLeads.filter((lead) => {
+  const filtered = mockLeads.filter((lead) => {
     const matchSearch =
-      !search ||
+      search === "" ||
       lead.name.toLowerCase().includes(search.toLowerCase()) ||
-      lead.service.toLowerCase().includes(search.toLowerCase()) ||
-      lead.phone.includes(search);
+      lead.company.toLowerCase().includes(search.toLowerCase()) ||
+      lead.email.toLowerCase().includes(search.toLowerCase());
+    const matchTab = activeTab === "all" || lead.status === activeTab;
     const matchStatus = statusFilter === "all" || lead.status === statusFilter;
-    return matchSearch && matchStatus;
+    const matchSource = sourceFilter === "all" || lead.source === sourceFilter;
+    const matchOwner = ownerFilter === "all" || lead.owner === ownerFilter;
+    return matchSearch && matchTab && matchStatus && matchSource && matchOwner;
   });
 
   return (
-    <div className="min-h-full bg-gray-50/50">
-      <div className="max-w-4xl mx-auto px-6 py-10">
-
-        {/* Header */}
-        <div className="flex items-start justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Leads</h1>
-            <p className="text-sm text-gray-500 mt-1">{filtered.length} leads</p>
-          </div>
-          <button className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 transition-colors">
+    <div className="p-6">
+      {/* Top row */}
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">Leads</h1>
+          <p className="text-sm text-gray-500 mt-0.5">312 total leads</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+            <Upload className="h-4 w-4" />
+            Import
+          </button>
+          <button className="flex items-center gap-1.5 rounded-lg bg-gray-900 px-3.5 py-2 text-sm font-medium text-white hover:bg-gray-800 transition-colors">
             <Plus className="h-4 w-4" />
             Add Lead
           </button>
         </div>
+      </div>
 
-        {/* Search + Filter */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, service, or phone..."
-              className="h-11 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-gray-400 focus:outline-none shadow-sm transition-colors"
-            />
-          </div>
-
-          {/* Status tabs */}
-          <div className="flex gap-1 bg-white rounded-xl border border-gray-200 p-1 shadow-sm">
-            {STATUSES.map(({ value, label }) => (
-              <button
-                key={value}
-                onClick={() => setStatusFilter(value)}
-                className={cn(
-                  "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap",
-                  statusFilter === value
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-                )}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+      {/* Filter bar */}
+      <div className="flex gap-3 mb-5 flex-wrap items-center">
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search leads..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-lg border border-gray-200 bg-white pl-9 pr-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-300 transition"
+          />
         </div>
 
-        {/* AI actions */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900/10 cursor-pointer"
+        >
+          <option value="all">All Statuses</option>
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="qualified">Qualified</option>
+          <option value="nurturing">Nurturing</option>
+          <option value="unqualified">Unqualified</option>
+          <option value="converted">Converted</option>
+        </select>
+
+        <select
+          value={sourceFilter}
+          onChange={(e) => setSourceFilter(e.target.value)}
+          className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900/10 cursor-pointer"
+        >
+          <option value="all">All Sources</option>
+          <option value="LinkedIn">LinkedIn</option>
+          <option value="Cold Email">Cold Email</option>
+          <option value="Referral">Referral</option>
+          <option value="Website">Website</option>
+          <option value="Ads">Ads</option>
+          <option value="Organic">Organic</option>
+        </select>
+
+        <select
+          value={ownerFilter}
+          onChange={(e) => setOwnerFilter(e.target.value)}
+          className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900/10 cursor-pointer"
+        >
+          <option value="all">All Owners</option>
+          <option value="Jordan N.">Jordan N.</option>
+        </select>
+
+        <div className="flex items-center gap-2 ml-auto">
+          <button
+            onClick={() => openWithQuery("Score all leads with AI and rank by intent")}
+            className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3.5 py-2 text-sm font-medium text-gray-700 hover:border-gray-900 hover:bg-gray-50 transition-colors"
+          >
+            <Sparkles className="h-4 w-4 text-violet-500" />
+            Score with AI
+          </button>
+          <button
+            onClick={() => openWithQuery("Draft outreach for top leads")}
+            className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3.5 py-2 text-sm font-medium text-gray-700 hover:border-gray-900 hover:bg-gray-50 transition-colors"
+          >
+            <PenLine className="h-4 w-4" />
+            Draft Outreach
+          </button>
+        </div>
+      </div>
+
+      {/* Segment tabs */}
+      <div className="flex border-b border-gray-200 mb-5 gap-0">
+        {SEGMENT_TABS.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => setActiveTab(tab.value)}
+            className={
+              activeTab === tab.value
+                ? "px-4 py-2.5 text-sm font-semibold text-gray-900 border-b-2 border-gray-900 -mb-px transition-colors"
+                : "px-4 py-2.5 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent -mb-px transition-colors"
+            }
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Table */}
+      <LeadTable leads={filtered} />
+
+      {/* AI Actions footer */}
+      <div className="mt-5 rounded-xl border border-gray-200 bg-white p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gray-900">
+            <Sparkles className="h-3.5 w-3.5 text-white" />
+          </div>
+          <span className="text-sm font-semibold text-gray-900">AI Lead Actions</span>
+          <span className="text-xs text-gray-400">— click any action to run it</span>
+        </div>
+        <div className="grid grid-cols-4 gap-3">
           {[
-            { label: "Who needs a follow-up?",    query: "Who do I need to follow up with today?" },
-            { label: "Show my hottest leads",      query: "Show my hottest leads" },
-            { label: "Write a text for a lead",   query: "Write a text reply for my top lead" },
-          ].map((a) => (
+            { label: "Score with AI", desc: "Rank leads by intent and fit", query: "Score all leads with AI and rank by intent" },
+            { label: "Segment with AI", desc: "Group by industry and signals", query: "Draft outreach for top leads" },
+            { label: "Draft Outreach", desc: "Write personalized cold emails", query: "Draft outreach for top leads" },
+            { label: "Generate Tasks", desc: "Create follow-up action items", query: "Generate follow-up tasks from my leads" },
+          ].map((action) => (
             <button
-              key={a.label}
-              onClick={() => openWithQuery(a.query)}
-              className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 shadow-sm transition-colors"
+              key={action.label}
+              onClick={() => openWithQuery(action.query)}
+              className="flex flex-col items-start rounded-xl border border-gray-200 bg-gray-50 p-4 text-left hover:border-gray-900 hover:bg-white transition-all group"
             >
-              <Sparkles className="h-3.5 w-3.5 text-gray-400" />
-              {a.label}
+              <span className="text-sm font-semibold text-gray-900 group-hover:text-gray-900 mb-1">{action.label}</span>
+              <span className="text-xs text-gray-400">{action.desc}</span>
             </button>
           ))}
         </div>
-
-        {/* Leads list */}
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-          {filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <p className="text-gray-500 font-medium mb-1">No leads found</p>
-              <p className="text-sm text-gray-400">Try a different search or filter</p>
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-50">
-              {/* Table header */}
-              <div className="grid grid-cols-[2fr_1.5fr_1fr_1fr_auto] gap-4 items-center px-5 py-3 bg-gray-50 text-xs font-semibold text-gray-400 uppercase tracking-wide">
-                <span>Name</span>
-                <span>Service Need</span>
-                <span>Status</span>
-                <span>Last Contact</span>
-                <span />
-              </div>
-
-              {/* Rows */}
-              {filtered.map((lead) => (
-                <LeadRow key={lead.id} lead={lead} openWithQuery={openWithQuery} />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Bottom AI nudge */}
-        <div className="mt-6 flex items-center gap-3 rounded-2xl border border-gray-100 bg-white px-5 py-4 shadow-sm">
-          <Sparkles className="h-4 w-4 text-gray-400" />
-          <p className="text-sm text-gray-600 flex-1">
-            <span className="font-semibold text-gray-900">AI tip:</span> 3 leads haven&apos;t been contacted in 5+ days. Want AI to write follow-up texts?
-          </p>
-          <button
-            onClick={() => openWithQuery("Write follow-up texts for leads with no contact in 5 days")}
-            className="shrink-0 flex items-center gap-1.5 rounded-xl bg-gray-900 px-4 py-2 text-xs font-semibold text-white hover:bg-gray-800 transition-colors"
-          >
-            Write texts
-            <ChevronRight className="h-3.5 w-3.5" />
-          </button>
-        </div>
-
-      </div>
-    </div>
-  );
-}
-
-function LeadRow({ lead, openWithQuery }: { lead: LiteLead; openWithQuery: (q: string) => void }) {
-  const st = STATUS_STYLE[lead.status];
-  return (
-    <div className="group grid grid-cols-[2fr_1.5fr_1fr_1fr_auto] gap-4 items-center px-5 py-4 hover:bg-gray-50 transition-colors">
-      {/* Name + phone */}
-      <div className="flex items-center gap-3 min-w-0">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-bold text-gray-600">
-          {lead.name.split(" ").map((n) => n[0]).join("")}
-        </div>
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-gray-900 truncate">{lead.name}</p>
-          <p className="text-xs text-gray-400 mt-0.5">{lead.phone}</p>
-        </div>
-      </div>
-
-      {/* Service */}
-      <p className="text-sm text-gray-700 truncate">{lead.service}</p>
-
-      {/* Status */}
-      <span className={cn("inline-flex rounded-full px-2.5 py-1 text-xs font-medium w-fit", st.color)}>
-        {st.label}
-      </span>
-
-      {/* Last contact */}
-      <p className="text-sm text-gray-500">{lead.lastContact}</p>
-
-      {/* Actions */}
-      <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button
-          onClick={() => openWithQuery(`Write a text reply for ${lead.name} about ${lead.service}`)}
-          className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors"
-        >
-          <Sparkles className="h-3 w-3 text-gray-400" />
-          Text
-        </button>
-        <Link
-          href="/demo/messages"
-          className="flex items-center justify-center rounded-lg border border-gray-200 p-1.5 text-gray-400 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-600 transition-colors"
-        >
-          <MessageSquare className="h-3.5 w-3.5" />
-        </Link>
-        <a
-          href={`tel:${lead.phone}`}
-          className="flex items-center justify-center rounded-lg border border-gray-200 p-1.5 text-gray-400 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-600 transition-colors"
-        >
-          <Phone className="h-3.5 w-3.5" />
-        </a>
       </div>
     </div>
   );
