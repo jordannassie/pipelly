@@ -11,9 +11,9 @@ import { cn } from "@/lib/utils";
 import { useDashboardMode } from "@/lib/dashboard-mode-context";
 import { useSidebar } from "@/lib/sidebar-context";
 
+// Business mode — full daily operating system for one business
 const agencyNav = [
   { label: "Home",        href: "/demo",             icon: LayoutDashboard },
-  { label: "Workspaces",  href: "/demo/workspaces",  icon: Building2 },
   { label: "Leads",       href: "/demo/leads",       icon: Users2 },
   { label: "Pipeline",    href: "/demo/pipeline",    icon: GitBranch },
   { label: "Contacts",    href: "/demo/contacts",    icon: Contact },
@@ -24,12 +24,12 @@ const agencyNav = [
   { label: "Settings",    href: "/demo/settings",    icon: Settings },
 ];
 
+// Agency mode — multi-client portfolio control center
 const clientNav = [
-  { label: "Home",     href: "/demo",          icon: LayoutDashboard },
-  { label: "Leads",    href: "/demo/leads",    icon: Users2 },
-  { label: "Messages", href: "/demo/messages", icon: MessageSquare },
-  { label: "Jobs",     href: "/demo/jobs",     icon: Briefcase },
-  { label: "Settings", href: "/demo/settings", icon: Settings },
+  { label: "Home",       href: "/demo",             icon: LayoutDashboard },
+  { label: "Workspaces", href: "/demo/workspaces",  icon: Building2 },
+  { label: "Analytics",  href: "/demo/analytics",   icon: BarChart3 },
+  { label: "Settings",   href: "/demo/settings",    icon: Settings },
 ];
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
@@ -124,13 +124,16 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
               {mode === "client" && label === "Analytics" && (
                 <span className="ml-auto rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100">Live</span>
               )}
+              {mode === "agency" && label === "Workspaces" && (
+                <span className="ml-auto rounded-full bg-gray-100 px-1.5 py-0.5 text-[9px] font-bold text-gray-500 border border-gray-200">5</span>
+              )}
             </Link>
           ))}
         </div>
 
-        {mode === "client" && (
+        {mode === "agency" && (
           <div className="mt-5 px-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-300 mb-1.5">Workspaces</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-300 mb-1.5">Client Workspaces</p>
             {["Apex Growth", "Northstar Media", "Elevate Roofing"].map((ws) => (
               <button key={ws} onClick={handleNav} className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-gray-400 hover:bg-gray-50 hover:text-gray-700 transition-colors">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shrink-0" />
