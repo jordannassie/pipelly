@@ -259,7 +259,7 @@ export default function MarketingPage() {
 
         <div className="relative max-w-5xl mx-auto px-6 text-center">
           {/* Headline */}
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 mb-6 leading-[1.05]">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 mb-6 leading-[1.05] mt-16 sm:mt-20">
             The AI-powered<br />
             {/* Fixed-height container prevents layout shift when phrase changes */}
             <span style={{ display: "block", height: "1.12em", overflow: "hidden" }}>
