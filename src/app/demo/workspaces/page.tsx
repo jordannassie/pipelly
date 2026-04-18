@@ -40,30 +40,45 @@ export default function WorkspacesPage() {
         </button>
       </div>
 
-      {/* AI Prompt Banner */}
+      {/* AI Workspace Builder */}
       <div className="rounded-2xl border border-gray-200 bg-white p-5 mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="h-4 w-4 text-gray-400" />
-          <p className="text-sm font-semibold text-gray-900">
-            Ask Pipelly to create a new client workspace
-          </p>
+        <div className="flex items-start gap-3 mb-4">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gray-900 shrink-0">
+            <Sparkles className="h-4 w-4 text-white" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-gray-900">Create a New Client Workspace with AI</p>
+            <p className="text-xs text-gray-500 mt-0.5">Describe your client in one sentence — Pipelly configures leads, pipeline stages, and automations automatically</p>
+          </div>
         </div>
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex items-center gap-3 mb-3">
           <input
             type="text"
             value={aiPrompt}
             onChange={(e) => setAiPrompt(e.target.value)}
-            placeholder="Describe your client — industry, location, goals..."
-            className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-700 placeholder:text-gray-400 outline-none focus:border-gray-400 focus:bg-white transition-colors"
+            placeholder="e.g. A roofing company in Dallas targeting homeowners — goal is booked inspections"
+            className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-700 placeholder:text-gray-400 outline-none focus:border-gray-900 focus:bg-white transition-colors"
           />
-          <button className="shrink-0 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 transition-colors">
+          <button className="shrink-0 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 transition-colors">
             Create Workspace
           </button>
         </div>
-        <p className="text-xs text-gray-400">
-          Describe your client — Pipelly will configure leads, pipeline, and
-          automations automatically
-        </p>
+        <div className="flex flex-wrap gap-2">
+          {[
+            "Roofing company in Texas targeting residential",
+            "B2B SaaS startup focused on SMB sales",
+            "Marketing agency scaling DTC client outreach",
+            "Solar company targeting homeowners in California",
+          ].map((s) => (
+            <button
+              key={s}
+              onClick={() => setAiPrompt(s)}
+              className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-colors"
+            >
+              {s}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Filter row */}

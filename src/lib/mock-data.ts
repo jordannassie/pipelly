@@ -187,20 +187,20 @@ export const mockWorkspacePerformance = [
 
 // ── AI Activity ────────────────────────────────────────────────────────────
 export const mockAIActivity: AIActivity[] = [
-  { id: "ai-1", message: "AI generated outreach sequence for 24 Elevate Roofing leads", time: "2 min ago", type: "outreach" },
-  { id: "ai-2", message: "47 leads imported from LinkedIn Sales Navigator — Apex Growth", time: "18 min ago", type: "import" },
-  { id: "ai-3", message: "Follow-up task created for Marcus Reid (Apex Growth)", time: "1h ago", type: "task" },
-  { id: "ai-4", message: "Automation triggered: Calendly → Demo Scheduled (Sophia Chen)", time: "2h ago", type: "automation" },
-  { id: "ai-5", message: "AI pipeline analysis: 3 deals flagged as at risk", time: "3h ago", type: "analysis" },
-  { id: "ai-6", message: "Outreach approved and sent to 12 BrightPath prospects", time: "5h ago", type: "outreach" },
+  { id: "ai-1", message: "AI drafted 3-step outreach sequence for 24 Elevate Roofing leads — awaiting approval", time: "2 min ago", type: "outreach" },
+  { id: "ai-2", message: "47 qualified leads imported from LinkedIn — scored and added to Apex Growth workspace", time: "18 min ago", type: "import" },
+  { id: "ai-3", message: "Follow-up task created for Marcus Reid — proposal follow-up due Thursday", time: "1h ago", type: "task" },
+  { id: "ai-4", message: "Automation fired: Sophia Chen booked via Calendly → deal moved to Demo Scheduled", time: "2h ago", type: "automation" },
+  { id: "ai-5", message: "Pipeline analysis complete: 3 deals at risk, $41k in deals with no recent activity", time: "3h ago", type: "analysis" },
+  { id: "ai-6", message: "Outreach campaign sent to 12 BrightPath prospects — reply rate tracking started", time: "5h ago", type: "outreach" },
 ];
 
 export const mockAISuggestions = [
-  { id: "s-1", message: "3 deals need follow-up today", action: "View deals", urgency: "high" },
-  { id: "s-2", message: "12 unreplied leads can be re-engaged", action: "Draft outreach", urgency: "medium" },
-  { id: "s-3", message: "Apex Growth has low booked call conversion", action: "Analyze", urgency: "medium" },
-  { id: "s-4", message: "Recommended: Calendly → move deal to Booked", action: "Enable", urgency: "low" },
-  { id: "s-5", message: "BrightPath workspace health dropped to Fair", action: "Review", urgency: "high" },
+  { id: "s-1", message: "Elevate Roofing ($24k) hasn't had activity in 6 days — at risk of going cold", action: "Draft follow-up", urgency: "high" },
+  { id: "s-2", message: "Marcus Reid replied to your proposal — respond before Thursday meeting", action: "View thread", urgency: "high" },
+  { id: "s-3", message: "12 leads went quiet 14+ days ago — AI can re-engage them automatically", action: "Re-engage now", urgency: "medium" },
+  { id: "s-4", message: "Booked call rate is down 3% — consider testing a new outreach subject line", action: "View analytics", urgency: "medium" },
+  { id: "s-5", message: "Calendly → Deal Stage automation is recommended based on your pipeline", action: "Enable automation", urgency: "low" },
 ];
 
 // ── Users ──────────────────────────────────────────────────────────────────
