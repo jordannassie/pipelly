@@ -8,9 +8,9 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
   return (
     <DashboardModeProvider>
       <AICopilotProvider>
-        <div className="flex h-screen w-full overflow-hidden bg-gray-50 dark:bg-gray-900">
+        <div className="flex h-screen w-full overflow-hidden bg-gray-50">
           <AppSidebar />
-          <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+          <div className="flex flex-1 flex-col overflow-hidden">
             <AppTopbar />
             <main className="flex-1 overflow-y-auto">
               {children}

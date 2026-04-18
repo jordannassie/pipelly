@@ -212,133 +212,151 @@ export const mockUsers: User[] = [
   { id: "u-5", name: "Ben Carter", email: "ben@daily.church", role: "Viewer", status: "deactivated", workspace: "BrightPath Consulting", lastActive: "2026-03-22", avatar: "BC" },
 ];
 
+// ── Lite: Small-Business Jobs ───────────────────────────────────────────────
+export type JobStage = "New Lead" | "Contacted" | "Estimate Sent" | "Booked" | "Job Done" | "Paid";
+
+export interface LiteJob {
+  id: string;
+  customer: string;
+  phone: string;
+  service: string;
+  value: number | null;
+  stage: JobStage;
+  address: string;
+  nextAction: string;
+  daysInStage: number;
+  source: string;
+}
+
+export const JOB_STAGES: JobStage[] = [
+  "New Lead", "Contacted", "Estimate Sent", "Booked", "Job Done", "Paid",
+];
+
+export const mockLiteJobs: LiteJob[] = [
+  { id: "j-1",  customer: "Dave Mitchell",    phone: "(214) 555-0182", service: "Roof Replacement",    value: 8500,  stage: "New Lead",      address: "2314 Oak Ln, Dallas TX",     nextAction: "Call back",           daysInStage: 0, source: "Google Ads" },
+  { id: "j-2",  customer: "Linda Perez",      phone: "(214) 555-0391", service: "Gutter Cleaning",    value: null,  stage: "New Lead",      address: "587 Maple Dr, Dallas TX",    nextAction: "Send intro text",     daysInStage: 1, source: "Referral" },
+  { id: "j-3",  customer: "Sarah Johnson",    phone: "(972) 555-0247", service: "Storm Damage Repair", value: 4200,  stage: "Contacted",     address: "910 Cedar Ct, Plano TX",     nextAction: "Schedule estimate",   daysInStage: 2, source: "Facebook Ads" },
+  { id: "j-4",  customer: "Mike Torres",      phone: "(214) 555-0554", service: "Leak Repair",        value: 1200,  stage: "Contacted",     address: "132 Birch St, Garland TX",   nextAction: "Send estimate",       daysInStage: 3, source: "Google Ads" },
+  { id: "j-5",  customer: "Jessica Kim",      phone: "(469) 555-0718", service: "Roof Replacement",   value: 11000, stage: "Estimate Sent", address: "45 Walnut Ave, Frisco TX",   nextAction: "Follow up on quote",  daysInStage: 3, source: "Referral" },
+  { id: "j-6",  customer: "Ray Dominguez",    phone: "(972) 555-0885", service: "Gutter Replacement", value: 2800,  stage: "Estimate Sent", address: "778 Elm Blvd, McKinney TX",  nextAction: "Call — quote pending", daysInStage: 5, source: "Door Knock" },
+  { id: "j-7",  customer: "Carol Stevens",    phone: "(214) 555-0133", service: "Skylight Install",   value: 3600,  stage: "Estimate Sent", address: "209 Pine Rd, Allen TX",      nextAction: "Follow up — 5 days",  daysInStage: 5, source: "Facebook Ads" },
+  { id: "j-8",  customer: "Tom Nguyen",       phone: "(972) 555-0467", service: "Full Roof Replace",  value: 14500, stage: "Booked",        address: "56 Spruce Dr, Irving TX",    nextAction: "Confirm Tuesday",     daysInStage: 1, source: "Google Ads" },
+  { id: "j-9",  customer: "Angela Brooks",    phone: "(214) 555-0629", service: "Flat Roof Repair",   value: 2100,  stage: "Booked",        address: "881 Hickory Ln, Denton TX",  nextAction: "Confirm materials",   daysInStage: 2, source: "Referral" },
+  { id: "j-10", customer: "Frank Osei",       phone: "(972) 555-0993", service: "Storm Damage Repair", value: 6800, stage: "Job Done",       address: "334 Aspen Way, Mesquite TX", nextAction: "Collect payment",     daysInStage: 1, source: "Google Ads" },
+  { id: "j-11", customer: "Maria Castillo",   phone: "(214) 555-0281", service: "Gutter Cleaning",    value: 350,   stage: "Job Done",       address: "17 Poplar St, Garland TX",   nextAction: "Send invoice",        daysInStage: 0, source: "Referral" },
+  { id: "j-12", customer: "Derek Wade",       phone: "(469) 555-0745", service: "Roof Replacement",   value: 9200,  stage: "Paid",          address: "600 Chestnut Dr, Plano TX",  nextAction: "Ask for review",      daysInStage: 2, source: "Facebook Ads" },
+  { id: "j-13", customer: "Pam Harrison",     phone: "(972) 555-0314", service: "Leak Repair",        value: 1100,  stage: "Paid",          address: "74 Magnolia Ct, Frisco TX",  nextAction: "Request referral",    daysInStage: 3, source: "Referral" },
+];
+
+// ── Lite: Small-Business Leads ──────────────────────────────────────────────
+export type LiteLeadStatus = "new" | "contacted" | "quote-sent" | "booked" | "closed";
+
+export interface LiteLead {
+  id: string;
+  name: string;
+  phone: string;
+  service: string;
+  status: LiteLeadStatus;
+  source: string;
+  lastContact: string;
+  notes: string;
+}
+
+export const mockLiteLeads: LiteLead[] = [
+  { id: "ll-1",  name: "Dave Mitchell",   phone: "(214) 555-0182", service: "Roof Replacement",    status: "new",       source: "Google Ads",   lastContact: "Today",      notes: "Filled out form — said shingles are missing" },
+  { id: "ll-2",  name: "Linda Perez",     phone: "(214) 555-0391", service: "Gutter Cleaning",    status: "new",       source: "Referral",     lastContact: "Today",      notes: "Friend recommended us — hasn't been called yet" },
+  { id: "ll-3",  name: "Sarah Johnson",   phone: "(972) 555-0247", service: "Storm Damage Repair", status: "contacted", source: "Facebook Ads", lastContact: "Yesterday",  notes: "Spoke briefly, wants estimate this week" },
+  { id: "ll-4",  name: "Mike Torres",     phone: "(214) 555-0554", service: "Leak Repair",        status: "contacted", source: "Google Ads",   lastContact: "2 days ago", notes: "Active leak in master bedroom — urgent" },
+  { id: "ll-5",  name: "Jessica Kim",     phone: "(469) 555-0718", service: "Roof Replacement",   status: "quote-sent", source: "Referral",    lastContact: "3 days ago", notes: "Quote sent $11k — following up today" },
+  { id: "ll-6",  name: "Ray Dominguez",   phone: "(972) 555-0885", service: "Gutter Replacement", status: "quote-sent", source: "Door Knock",  lastContact: "5 days ago", notes: "No response to quote — needs follow up" },
+  { id: "ll-7",  name: "Carol Stevens",   phone: "(214) 555-0133", service: "Skylight Install",   status: "quote-sent", source: "Facebook Ads", lastContact: "5 days ago", notes: "Quote sent 5 days ago — no reply" },
+  { id: "ll-8",  name: "Tom Nguyen",      phone: "(972) 555-0467", service: "Full Roof Replace",  status: "booked",    source: "Google Ads",   lastContact: "1 day ago",  notes: "Booked for Tuesday — confirmed via text" },
+  { id: "ll-9",  name: "Angela Brooks",   phone: "(214) 555-0629", service: "Flat Roof Repair",   status: "booked",    source: "Referral",     lastContact: "2 days ago", notes: "Booked for Thursday morning" },
+  { id: "ll-10", name: "Frank Osei",      phone: "(972) 555-0993", service: "Storm Damage",       status: "closed",    source: "Google Ads",   lastContact: "4 days ago", notes: "Job completed, collecting payment" },
+];
+
+// ── Lite: Messages/Conversations ────────────────────────────────────────────
+export interface LiteMessage {
+  id: string;
+  from: string;
+  phone: string;
+  preview: string;
+  time: string;
+  unread: boolean;
+  service: string;
+  messages: { sender: "them" | "me"; text: string; time: string }[];
+}
+
+export const mockLiteMessages: LiteMessage[] = [
+  {
+    id: "m-1", from: "Dave Mitchell", phone: "(214) 555-0182", service: "Roof Replacement",
+    preview: "Hey, I filled out your form about the roof. Is someone available this week?",
+    time: "10 min ago", unread: true,
+    messages: [
+      { sender: "them", text: "Hey, I filled out your form about the roof. Is someone available this week?", time: "10:14 AM" },
+    ],
+  },
+  {
+    id: "m-2", from: "Jessica Kim", phone: "(469) 555-0718", service: "Roof Replacement",
+    preview: "I got the quote. Can you explain what the 30-year shingles option includes?",
+    time: "1h ago", unread: true,
+    messages: [
+      { sender: "them", text: "I got the quote. Can you explain what the 30-year shingles option includes?", time: "9:22 AM" },
+      { sender: "me",   text: "Hi Jessica! The 30-year option includes architectural shingles, new underlayment, and a full ridge cap. Want me to send a comparison sheet?", time: "9:35 AM" },
+      { sender: "them", text: "Yes please! Also does that include cleanup?", time: "9:48 AM" },
+    ],
+  },
+  {
+    id: "m-3", from: "Tom Nguyen", phone: "(972) 555-0467", service: "Full Roof Replace",
+    preview: "Confirmed for Tuesday. What time will your crew arrive?",
+    time: "2h ago", unread: false,
+    messages: [
+      { sender: "them", text: "Confirmed for Tuesday. What time will your crew arrive?", time: "8:05 AM" },
+      { sender: "me",   text: "Hey Tom! Planning on 7:30 AM start. We'll text you 30 min before we head over.", time: "8:12 AM" },
+      { sender: "them", text: "Perfect, thank you!", time: "8:14 AM" },
+    ],
+  },
+  {
+    id: "m-4", from: "Sarah Johnson", phone: "(972) 555-0247", service: "Storm Damage Repair",
+    preview: "When can you come out for an estimate? Mornings work best for me.",
+    time: "Yesterday", unread: false,
+    messages: [
+      { sender: "them", text: "When can you come out for an estimate? Mornings work best for me.", time: "Apr 17, 3:45 PM" },
+      { sender: "me",   text: "Hi Sarah! We can do Monday or Wednesday morning. Which works better?", time: "Apr 17, 4:02 PM" },
+    ],
+  },
+  {
+    id: "m-5", from: "Ray Dominguez", phone: "(972) 555-0885", service: "Gutter Replacement",
+    preview: "Still thinking about it. What's your warranty on the gutters?",
+    time: "3 days ago", unread: false,
+    messages: [
+      { sender: "me",   text: "Hi Ray, just following up on the estimate we sent. Any questions?", time: "Apr 13, 9:00 AM" },
+      { sender: "them", text: "Still thinking about it. What's your warranty on the gutters?", time: "Apr 13, 2:30 PM" },
+    ],
+  },
+];
+
+// ── Lite: KPIs ──────────────────────────────────────────────────────────────
+export const mockLiteKPIs = [
+  { label: "New Leads",          value: 12,      change: 4,   trend: "up"   as const },
+  { label: "Follow Ups Needed",  value: 4,       change: -2,  trend: "down" as const },
+  { label: "Booked Jobs",        value: 7,       change: 2,   trend: "up"   as const },
+  { label: "Revenue This Month", value: "$8,400", change: 18, trend: "up"   as const },
+];
+
+// ── Lite: Today's Tasks ──────────────────────────────────────────────────────
+export const mockLiteTasks = [
+  { id: "lt-1", text: "Call Dave Mitchell back — new roof lead",            urgency: "high",   done: false },
+  { id: "lt-2", text: "Follow up on Jessica Kim's estimate (3 days no reply)", urgency: "high", done: false },
+  { id: "lt-3", text: "Confirm Tuesday job details with Tom Nguyen",        urgency: "medium", done: false },
+  { id: "lt-4", text: "Send invoice to Frank Osei — job completed",        urgency: "medium", done: false },
+  { id: "lt-5", text: "Reply to Carol Stevens about skylight quote",        urgency: "low",    done: false },
+];
+
 // ── Invoices ───────────────────────────────────────────────────────────────
 export const mockInvoices: Invoice[] = [
   { id: "inv-001", date: "2026-04-01", amount: 297, status: "paid" },
   { id: "inv-002", date: "2026-03-01", amount: 297, status: "paid" },
   { id: "inv-003", date: "2026-02-01", amount: 297, status: "paid" },
   { id: "inv-004", date: "2026-01-01", amount: 197, status: "paid" },
-];
-
-// ── Agency Client Accounts ─────────────────────────────────────────────────
-export interface AgencyClient {
-  id: string;
-  name: string;
-  industry: string;
-  adminUser: string;
-  adminEmail: string;
-  setupStatus: "launched" | "in_progress" | "pending";
-  health: "excellent" | "good" | "needs_attention" | "flagged";
-  leads: number;
-  revenue: number;
-  lastActivity: string;
-  avatar: string;
-  color: string;
-}
-
-export const mockAgencyClients: AgencyClient[] = [
-  {
-    id: "ac-1",
-    name: "Apex Roofing",
-    industry: "Home Services",
-    adminUser: "Mike Chen",
-    adminEmail: "mike@apexroofing.com",
-    setupStatus: "launched",
-    health: "excellent",
-    leads: 207,
-    revenue: 72000,
-    lastActivity: "2 hours ago",
-    avatar: "AR",
-    color: "bg-emerald-500",
-  },
-  {
-    id: "ac-2",
-    name: "BrightPath Plumbing",
-    industry: "Plumbing",
-    adminUser: "Sara Lee",
-    adminEmail: "sara@brightpath.com",
-    setupStatus: "in_progress",
-    health: "good",
-    leads: 84,
-    revenue: 31500,
-    lastActivity: "1 day ago",
-    avatar: "BP",
-    color: "bg-blue-500",
-  },
-  {
-    id: "ac-3",
-    name: "Northstar Med Spa",
-    industry: "Medical Aesthetics",
-    adminUser: "Dr. Priya Shah",
-    adminEmail: "priya@northstarmedspa.com",
-    setupStatus: "in_progress",
-    health: "needs_attention",
-    leads: 63,
-    revenue: 48000,
-    lastActivity: "3 days ago",
-    avatar: "NS",
-    color: "bg-violet-500",
-  },
-  {
-    id: "ac-4",
-    name: "Elevate Solar",
-    industry: "Solar Energy",
-    adminUser: "Tom Rivera",
-    adminEmail: "tom@elevatesolar.com",
-    setupStatus: "pending",
-    health: "flagged",
-    leads: 12,
-    revenue: 0,
-    lastActivity: "5 days ago",
-    avatar: "ES",
-    color: "bg-amber-500",
-  },
-  {
-    id: "ac-5",
-    name: "Greenleaf Landscaping",
-    industry: "Landscaping",
-    adminUser: "Amy Brooks",
-    adminEmail: "amy@greenleaf.com",
-    setupStatus: "launched",
-    health: "good",
-    leads: 119,
-    revenue: 27800,
-    lastActivity: "4 hours ago",
-    avatar: "GL",
-    color: "bg-teal-500",
-  },
-];
-
-export interface SetupQueueItem {
-  id: string;
-  client: string;
-  status: string;
-  step: string;
-  assignee: string;
-  updatedAt: string;
-}
-
-export const mockSetupQueue: SetupQueueItem[] = [
-  { id: "sq-1", client: "Elevate Solar", status: "pending", step: "Awaiting admin invite", assignee: "Jordan N.", updatedAt: "5 days ago" },
-  { id: "sq-2", client: "BrightPath Plumbing", status: "in_progress", step: "Connecting calendar integration", assignee: "Jordan N.", updatedAt: "1 day ago" },
-  { id: "sq-3", client: "Northstar Med Spa", status: "in_progress", step: "Configuring pipeline stages", assignee: "Ava T.", updatedAt: "2 days ago" },
-];
-
-// ── Business Calendar Events ───────────────────────────────────────────────
-export interface CalendarEvent {
-  id: string;
-  title: string;
-  time: string;
-  duration: string;
-  type: "call" | "estimate" | "job" | "followup" | "meeting";
-  contact: string;
-  address?: string;
-  notes?: string;
-}
-
-export const mockCalendarEvents: CalendarEvent[] = [
-  { id: "ce-1", title: "Estimate call — Brian Walters", time: "9:00 AM", duration: "30 min", type: "estimate", contact: "Brian Walters", notes: "Roof replacement quote" },
-  { id: "ce-2", title: "Job: Replace gutters — Donna P.", time: "11:00 AM", duration: "2 hrs", type: "job", contact: "Donna Park", address: "284 Elmwood Dr" },
-  { id: "ce-3", title: "Follow-up call — Carlos M.", time: "2:00 PM", duration: "15 min", type: "followup", contact: "Carlos Mendez", notes: "Estimate was sent 3 days ago" },
-  { id: "ce-4", title: "New lead intake — Sandra H.", time: "4:00 PM", duration: "20 min", type: "call", contact: "Sandra Hill", notes: "Referred by Brian Walters" },
 ];

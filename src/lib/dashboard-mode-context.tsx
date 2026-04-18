@@ -1,45 +1,52 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 
-export type DashboardMode = "agency" | "business";
+export type DashboardMode = "agency" | "client";
 
 interface DashboardModeContextType {
   mode: DashboardMode;
-  setMode: (m: DashboardMode) => void;
+  hasChosen: boolean;
+  setMode: (mode: DashboardMode) => void;
+  resetChoice: () => void;
 }
 
-const DashboardModeContext = createContext<DashboardModeContextType>({
-  mode: "agency",
-  setMode: () => {},
-});
+const DashboardModeContext = createContext<DashboardModeContextType | null>(null);
+
+const STORAGE_KEY = "pipelly-dashboard-mode";
 
 export function DashboardModeProvider({ children }: { children: ReactNode }) {
-  const [mode, setModeState] = useState<DashboardMode>("agency");
-  const [mounted, setMounted] = useState(false);
+  const [mode, setModeState] = useState<DashboardMode>("client");
+  const [hasChosen, setHasChosen] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("pipelly_mode") as DashboardMode | null;
-    if (stored === "agency" || stored === "business") {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored === "agency" || stored === "client") {
       setModeState(stored);
+      setHasChosen(true);
     }
-    setMounted(true);
   }, []);
 
-  const setMode = (m: DashboardMode) => {
+  const setMode = useCallback((m: DashboardMode) => {
     setModeState(m);
-    localStorage.setItem("pipelly_mode", m);
-  };
+    setHasChosen(true);
+    localStorage.setItem(STORAGE_KEY, m);
+  }, []);
 
-  if (!mounted) return null;
+  const resetChoice = useCallback(() => {
+    setHasChosen(false);
+    localStorage.removeItem(STORAGE_KEY);
+  }, []);
 
   return (
-    <DashboardModeContext.Provider value={{ mode, setMode }}>
+    <DashboardModeContext.Provider value={{ mode, hasChosen, setMode, resetChoice }}>
       {children}
     </DashboardModeContext.Provider>
   );
 }
 
 export function useDashboardMode() {
-  return useContext(DashboardModeContext);
+  const ctx = useContext(DashboardModeContext);
+  if (!ctx) throw new Error("useDashboardMode must be used within DashboardModeProvider");
+  return ctx;
 }
