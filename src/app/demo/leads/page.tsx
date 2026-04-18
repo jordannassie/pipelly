@@ -5,6 +5,7 @@ import { Search, Sparkles, PenLine, Upload, Plus } from "lucide-react";
 import { mockLeads } from "@/lib/mock-data";
 import { LeadTable } from "@/components/leads/LeadTable";
 import type { LeadStatus } from "@/lib/types";
+import { useAICopilot } from "@/lib/ai-copilot-context";
 
 const SEGMENT_TABS: { label: string; value: LeadStatus | "all" }[] = [
   { label: "All Leads", value: "all" },
@@ -20,6 +21,7 @@ export default function LeadsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [sourceFilter, setSourceFilter] = useState("all");
   const [ownerFilter, setOwnerFilter] = useState("all");
+  const { openWithQuery } = useAICopilot();
 
   const filtered = mockLeads.filter((lead) => {
     const matchSearch =
@@ -105,11 +107,17 @@ export default function LeadsPage() {
         </select>
 
         <div className="flex items-center gap-2 ml-auto">
-          <button className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+          <button
+            onClick={() => openWithQuery("Score all leads with AI and rank by intent")}
+            className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3.5 py-2 text-sm font-medium text-gray-700 hover:border-gray-900 hover:bg-gray-50 transition-colors"
+          >
             <Sparkles className="h-4 w-4 text-violet-500" />
             Score with AI
           </button>
-          <button className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+          <button
+            onClick={() => openWithQuery("Draft outreach for top leads")}
+            className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3.5 py-2 text-sm font-medium text-gray-700 hover:border-gray-900 hover:bg-gray-50 transition-colors"
+          >
             <PenLine className="h-4 w-4" />
             Draft Outreach
           </button>
@@ -137,28 +145,30 @@ export default function LeadsPage() {
       <LeadTable leads={filtered} />
 
       {/* AI Actions footer */}
-      <div className="mt-5 rounded-xl border border-gray-200 bg-white p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="h-4 w-4 text-violet-500" />
+      <div className="mt-5 rounded-xl border border-gray-200 bg-white p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gray-900">
+            <Sparkles className="h-3.5 w-3.5 text-white" />
+          </div>
           <span className="text-sm font-semibold text-gray-900">AI Lead Actions</span>
+          <span className="text-xs text-gray-400">— click any action to run it</span>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <button className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-            Score with AI
-            <span className="ml-1.5 text-xs text-gray-400">analyze lead quality</span>
-          </button>
-          <button className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-            Segment with AI
-            <span className="ml-1.5 text-xs text-gray-400">group by intent</span>
-          </button>
-          <button className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-            Draft Outreach
-            <span className="ml-1.5 text-xs text-gray-400">write personalized messages</span>
-          </button>
-          <button className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-            Find Similar Leads
-            <span className="ml-1.5 text-xs text-gray-400">expand your list</span>
-          </button>
+        <div className="grid grid-cols-4 gap-3">
+          {[
+            { label: "Score with AI", desc: "Rank leads by intent and fit", query: "Score all leads with AI and rank by intent" },
+            { label: "Segment with AI", desc: "Group by industry and signals", query: "Draft outreach for top leads" },
+            { label: "Draft Outreach", desc: "Write personalized cold emails", query: "Draft outreach for top leads" },
+            { label: "Generate Tasks", desc: "Create follow-up action items", query: "Generate follow-up tasks from my leads" },
+          ].map((action) => (
+            <button
+              key={action.label}
+              onClick={() => openWithQuery(action.query)}
+              className="flex flex-col items-start rounded-xl border border-gray-200 bg-gray-50 p-4 text-left hover:border-gray-900 hover:bg-white transition-all group"
+            >
+              <span className="text-sm font-semibold text-gray-900 group-hover:text-gray-900 mb-1">{action.label}</span>
+              <span className="text-xs text-gray-400">{action.desc}</span>
+            </button>
+          ))}
         </div>
       </div>
     </div>

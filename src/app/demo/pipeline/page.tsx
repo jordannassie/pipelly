@@ -3,8 +3,10 @@
 import { ChevronDown, Plus, Filter, LayoutGrid, List, Sparkles } from "lucide-react";
 import { mockDeals } from "@/lib/mock-data";
 import { PipelineBoard } from "@/components/pipeline/PipelineBoard";
+import { useAICopilot } from "@/lib/ai-copilot-context";
 
 export default function PipelinePage() {
+  const { openWithQuery } = useAICopilot();
   return (
     <div className="p-6">
       {/* Top row */}
@@ -59,12 +61,30 @@ export default function PipelinePage() {
             <span className="font-semibold">AI Pipeline Insights:</span>{" "}
             3 deals haven&#39;t had activity in 7+ days. Elevate Roofing ($24k) is at highest risk of going cold.
           </p>
-          <div className="flex items-center gap-3 mt-2">
-            <button className="text-xs font-medium text-amber-700 underline underline-offset-2 hover:text-amber-800 transition-colors">
-              View at-risk deals
+          <div className="flex items-center gap-3 mt-2 flex-wrap">
+            <button
+              onClick={() => openWithQuery("Analyze my pipeline and identify at-risk deals")}
+              className="text-xs font-medium text-amber-700 underline underline-offset-2 hover:text-amber-800 transition-colors"
+            >
+              Analyze with AI
             </button>
-            <button className="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700 transition-colors">
-              Suggest next actions
+            <button
+              onClick={() => openWithQuery("Draft outreach for stuck deals in my pipeline")}
+              className="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700 transition-colors"
+            >
+              Draft Follow-ups
+            </button>
+            <button
+              onClick={() => openWithQuery("Generate follow-up tasks from my pipeline deals")}
+              className="rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-50 transition-colors"
+            >
+              Generate Tasks
+            </button>
+            <button
+              onClick={() => openWithQuery("Recommend automations for my pipeline")}
+              className="rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-50 transition-colors"
+            >
+              Recommend Automations
             </button>
           </div>
         </div>

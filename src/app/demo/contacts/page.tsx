@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Search, Sparkles, Activity, Mail, Phone, Building2, MapPin, Globe, Link, Plus } from "lucide-react";
+import { useAICopilot } from "@/lib/ai-copilot-context";
 import { mockContacts } from "@/lib/mock-data";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
@@ -28,6 +29,7 @@ export default function ContactsPage() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Contact>(mockContacts[0]);
   const [activeTab, setActiveTab] = useState<Tab>("activity");
+  const { openWithQuery } = useAICopilot();
 
   const filtered = mockContacts.filter(
     (c) =>
@@ -126,24 +128,30 @@ export default function ContactsPage() {
             </div>
 
             {/* AI Actions box */}
-            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 mb-5">
+            <div className="rounded-xl border border-gray-200 bg-white p-4 mb-5">
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="h-4 w-4 text-violet-500" />
+                <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-gray-900">
+                  <Sparkles className="h-3 w-3 text-white" />
+                </div>
                 <span className="text-sm font-semibold text-gray-900">AI Actions</span>
+                <span className="text-xs text-gray-400">for {selected.name}</span>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <button className="rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
-                  Summarize contact
-                </button>
-                <button className="rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
-                  Draft follow-up
-                </button>
-                <button className="rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
-                  Suggest call notes
-                </button>
-                <button className="rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
-                  Create next steps
-                </button>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: "Summarize contact", desc: "Full AI profile & signals", query: `Summarize contact ${selected.name}` },
+                  { label: "Draft follow-up",   desc: "Personalized email draft",  query: `Draft outreach for ${selected.name} at ${selected.company}` },
+                  { label: "Generate tasks",    desc: "Create next-step actions",  query: `Generate follow-up tasks for ${selected.name}` },
+                  { label: "Recommend automations", desc: "Smart workflow suggestions", query: "Recommend automations for contact management" },
+                ].map((action) => (
+                  <button
+                    key={action.label}
+                    onClick={() => openWithQuery(action.query)}
+                    className="flex flex-col items-start rounded-xl border border-gray-200 bg-gray-50 p-3 text-left hover:border-gray-900 hover:bg-white transition-all"
+                  >
+                    <span className="text-xs font-semibold text-gray-900 mb-0.5">{action.label}</span>
+                    <span className="text-[10px] text-gray-400">{action.desc}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
