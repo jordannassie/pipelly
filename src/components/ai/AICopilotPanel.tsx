@@ -610,13 +610,168 @@ export function AICopilotPanel() {
   const formatTime = (d: Date) =>
     d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
 
+  const openCopilot = () => {
+    setOpen(true);
+    if (messages.length === 0) setMessages(initMessages());
+  };
+
+  const PanelContent = (
+    <>
+      {/* Header */}
+      <div className="flex items-center gap-2 border-b border-gray-800 bg-gray-900 px-4 py-3.5 shrink-0">
+        <Sparkles className="h-4 w-4 text-white" />
+        <span className="text-sm font-semibold text-white">AI Copilot</span>
+        <span className="flex items-center gap-1 rounded-full bg-emerald-400/20 border border-emerald-500/30 px-2 py-0.5 text-[9px] font-bold text-emerald-300">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />LIVE
+        </span>
+        <div className="ml-auto flex items-center gap-1">
+          <button
+            onClick={() => { setMessages(initMessages()); }}
+            className="flex h-6 w-6 items-center justify-center rounded-md text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+            title="Clear chat"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => setOpen(false)}
+            className="flex h-6 w-6 items-center justify-center rounded-md text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+            title="Close"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto bg-gray-50 px-4 py-4 space-y-4">
+        {messages.map((m) => (
+          <div key={m.id} className={cn("flex flex-col", m.role === "user" ? "items-end" : "items-start")}>
+            {m.role === "ai" && (
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-900">
+                  <Sparkles className="h-3 w-3 text-white" />
+                </div>
+                <span className="text-[10px] font-medium text-gray-500">Pipelly AI · {formatTime(m.timestamp)}</span>
+              </div>
+            )}
+            {m.card ? (
+              <div className="w-full">{renderCard(m.card)}</div>
+            ) : (
+              <div className={cn(
+                "max-w-[92%] rounded-xl px-3.5 py-2.5 text-sm leading-relaxed",
+                m.role === "user"
+                  ? "bg-gray-900 text-white rounded-br-sm"
+                  : "bg-white text-gray-800 rounded-bl-sm border border-gray-200 shadow-sm"
+              )}>
+                {renderContent(m.content ?? "")}
+              </div>
+            )}
+            {m.role === "user" && (
+              <span className="mt-1 text-[10px] text-gray-400">{formatTime(m.timestamp)}</span>
+            )}
+          </div>
+        ))}
+        {loading && <TypingIndicator query={loadingQuery} />}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Quick suggestions */}
+      <div className="border-t border-gray-100 bg-white px-4 py-2.5 shrink-0">
+        <div className="flex items-center gap-1.5 mb-2">
+          <Lightbulb className="h-3 w-3 text-gray-400" />
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Quick actions</span>
+        </div>
+        <div className="flex gap-1.5 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+          {suggestions.map((s) => (
+            <button
+              key={s.label}
+              onClick={() => send(s.query)}
+              className="flex-shrink-0 flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-600 hover:border-gray-900 hover:bg-white hover:text-gray-900 transition-colors"
+            >
+              {s.label}
+              <ChevronRight className="h-3 w-3" />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Input */}
+      <div className="border-t border-gray-200 bg-white p-3 shrink-0">
+        <div className={cn(
+          "flex items-center gap-2 rounded-xl border px-3 py-2 transition-all",
+          input ? "border-gray-900 bg-white" : "border-gray-200 bg-gray-50"
+        )}>
+          <Sparkles className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+          <input
+            ref={inputRef}
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send(input)}
+            placeholder="Ask Pipelly anything..."
+            className="flex-1 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 outline-none"
+          />
+          <button
+            onClick={() => send(input)}
+            disabled={!input.trim() || loading}
+            className="flex h-6 w-6 items-center justify-center rounded-lg bg-gray-900 text-white disabled:opacity-30 hover:bg-gray-700 transition-colors shrink-0"
+          >
+            <Send className="h-3 w-3" />
+          </button>
+        </div>
+        <p className="mt-1.5 text-center text-[10px] text-gray-400">AI responses are illustrative · for demo purposes</p>
+      </div>
+    </>
+  );
+
   return (
     <>
-      {/* Floating trigger — always visible when closed */}
+      {/* ── DESKTOP: integrated sidebar panel ───────────────────────────── */}
+
+      {/* Closed: narrow side tab */}
+      {!isOpen && (
+        <div className="hidden md:flex h-full w-10 flex-shrink-0 flex-col border-l border-gray-200 bg-white">
+          <button
+            onClick={openCopilot}
+            className="group flex flex-1 flex-col items-center gap-3 py-5 w-full hover:bg-gray-50 transition-colors"
+            aria-label="Open AI Copilot"
+          >
+            {/* Icon */}
+            <div className="relative flex-shrink-0">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gray-900 group-hover:bg-gray-700 transition-colors">
+                <Sparkles className="h-3.5 w-3.5 text-white" />
+              </div>
+              <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-400 text-[8px] font-bold text-gray-900">
+                6
+              </span>
+            </div>
+            {/* Vertical label */}
+            <span
+              className="text-[10px] font-semibold text-gray-400 group-hover:text-gray-700 transition-colors tracking-widest uppercase"
+              style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
+            >
+              AI Copilot
+            </span>
+            {/* Live dot */}
+            <span className="flex-shrink-0 h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          </button>
+        </div>
+      )}
+
+      {/* Open: full integrated panel */}
+      {isOpen && (
+        <div className="hidden md:flex h-full w-[340px] flex-shrink-0 flex-col border-l border-gray-200 bg-white overflow-hidden">
+          {PanelContent}
+        </div>
+      )}
+
+      {/* ── MOBILE: floating button + full-screen overlay ─────────────── */}
+
+      {/* Closed: floating circle */}
       {!isOpen && (
         <button
-          onClick={() => { setOpen(true); if (messages.length === 0) setMessages(initMessages()); }}
-          className="fixed bottom-6 right-6 z-50"
+          onClick={openCopilot}
+          className="fixed bottom-6 right-6 z-50 md:hidden"
           aria-label="Open AI Copilot"
         >
           <span className="absolute inset-0 rounded-full bg-gray-700 animate-ping opacity-20" />
@@ -629,124 +784,14 @@ export function AICopilotPanel() {
         </button>
       )}
 
-      {/* Full-height right-side panel */}
+      {/* Open: full-screen overlay on mobile */}
       {isOpen && (
-        <>
-          {/* Backdrop (subtle) */}
-          <div
-            className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px]"
-            onClick={() => setOpen(false)}
-          />
-
-          <div className="fixed top-0 right-0 z-50 flex h-screen w-full sm:w-[400px] flex-col border-l border-gray-200 bg-white shadow-2xl overflow-hidden" style={{ animation: "slideInRight 0.2s ease-out" }}>
-
-          {/* Header */}
-          <div className="flex items-center gap-2 border-b border-gray-800 bg-gray-900 px-4 py-3.5 shrink-0">
-            <button
-              onClick={() => setOpen(false)}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
-              title="Close"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-            <Sparkles className="h-4 w-4 text-white" />
-            <span className="text-sm font-semibold text-white">AI Copilot</span>
-            <span className="flex items-center gap-1 rounded-full bg-emerald-400/20 border border-emerald-500/30 px-2 py-0.5 text-[9px] font-bold text-emerald-300">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />LIVE
-            </span>
-            <div className="ml-auto flex items-center gap-1">
-              <button
-                onClick={() => { setMessages(initMessages()); }}
-                className="flex h-6 w-6 items-center justify-center rounded-md text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
-                title="Clear chat"
-              >
-                <RotateCcw className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          </div>
-
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto bg-gray-50 px-4 py-4 space-y-4">
-            {messages.map((m) => (
-              <div key={m.id} className={cn("flex flex-col", m.role === "user" ? "items-end" : "items-start")}>
-                {m.role === "ai" && (
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-900">
-                      <Sparkles className="h-3 w-3 text-white" />
-                    </div>
-                    <span className="text-[10px] font-medium text-gray-500">Pipelly AI · {formatTime(m.timestamp)}</span>
-                  </div>
-                )}
-                {m.card ? (
-                  <div className="w-full">{renderCard(m.card)}</div>
-                ) : (
-                  <div className={cn(
-                    "max-w-[92%] rounded-xl px-3.5 py-2.5 text-sm leading-relaxed",
-                    m.role === "user"
-                      ? "bg-gray-900 text-white rounded-br-sm"
-                      : "bg-white text-gray-800 rounded-bl-sm border border-gray-200 shadow-sm"
-                  )}>
-                    {renderContent(m.content ?? "")}
-                  </div>
-                )}
-                {m.role === "user" && (
-                  <span className="mt-1 text-[10px] text-gray-400">{formatTime(m.timestamp)}</span>
-                )}
-              </div>
-            ))}
-
-            {loading && <TypingIndicator query={loadingQuery} />}
-            <div ref={bottomRef} />
-          </div>
-
-          {/* Quick suggestions */}
-          <div className="border-t border-gray-100 bg-white px-4 py-2.5 shrink-0">
-            <div className="flex items-center gap-1.5 mb-2">
-              <Lightbulb className="h-3 w-3 text-gray-400" />
-              <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Quick actions</span>
-            </div>
-            <div className="flex gap-1.5 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
-              {suggestions.map((s) => (
-                <button
-                  key={s.label}
-                  onClick={() => send(s.query)}
-                  className="flex-shrink-0 flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-600 hover:border-gray-900 hover:bg-white hover:text-gray-900 transition-colors"
-                >
-                  {s.label}
-                  <ChevronRight className="h-3 w-3" />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Input */}
-          <div className="border-t border-gray-200 bg-white p-3 shrink-0">
-            <div className={cn(
-              "flex items-center gap-2 rounded-xl border px-3 py-2 transition-all",
-              input ? "border-gray-900 bg-white" : "border-gray-200 bg-gray-50"
-            )}>
-              <Sparkles className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send(input)}
-                placeholder="Ask Pipelly anything..."
-                className="flex-1 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 outline-none"
-              />
-              <button
-                onClick={() => send(input)}
-                disabled={!input.trim() || loading}
-                className="flex h-6 w-6 items-center justify-center rounded-lg bg-gray-900 text-white disabled:opacity-30 hover:bg-gray-700 transition-colors shrink-0"
-              >
-                <Send className="h-3 w-3" />
-              </button>
-            </div>
-            <p className="mt-1.5 text-center text-[10px] text-gray-400">AI responses are illustrative · for demo purposes</p>
-          </div>
+        <div
+          className="fixed inset-0 z-50 flex flex-col bg-white md:hidden"
+          style={{ animation: "slideInRight 0.2s ease-out" }}
+        >
+          {PanelContent}
         </div>
-        </>
       )}
     </>
   );
