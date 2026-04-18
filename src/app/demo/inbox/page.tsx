@@ -23,7 +23,7 @@ export default function InboxPage() {
   const unreadCount = mockThreads.filter((t) => !t.read).length;
 
   return (
-    <div className="flex h-full overflow-hidden">
+    <div className="flex h-full overflow-hidden flex-col md:flex-row">
       {/* Left Rail */}
       <div className="w-56 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col">
         <div className="p-3 border-b border-gray-100">
@@ -68,7 +68,7 @@ export default function InboxPage() {
       </div>
 
       {/* Middle Panel */}
-      <div className="w-80 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col">
+      <div className="w-full md:w-80 flex-shrink-0 border-b md:border-b-0 md:border-r border-gray-200 bg-white flex flex-col max-h-56 md:max-h-none">
         <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-gray-100 shrink-0">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-gray-900">Inbox</span>

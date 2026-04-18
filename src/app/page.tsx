@@ -267,7 +267,7 @@ export default function MarketingPage() {
           </div>
 
           {/* Social proof */}
-          <div className="flex items-center justify-center gap-6 text-sm text-gray-400 mb-16">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-gray-400 mb-16">
             {["No setup required", "Works in minutes", "AI does the heavy lifting"].map((t) => (
               <div key={t} className="flex items-center gap-1.5">
                 <Check className="h-3.5 w-3.5 text-emerald-500" />

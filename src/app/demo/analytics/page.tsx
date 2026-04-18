@@ -66,7 +66,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* KPI Grid */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {mockKPIs.map((kpi) => (
           <KPIStatCard key={kpi.label} {...kpi} />
         ))}
@@ -91,7 +91,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {/* Lead & Booking Trends — 2/3 */}
         <div className="col-span-2 rounded-xl border border-gray-200 bg-white p-5">
           <div className="flex items-center justify-between gap-2 mb-1">

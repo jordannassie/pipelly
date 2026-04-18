@@ -622,11 +622,11 @@ function AgencyHome() {
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
   return (
-    <div className="p-7 space-y-7">
+    <div className="p-4 sm:p-7 space-y-5 sm:space-y-7">
 
       {/* AI Command Hero */}
       <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-        <div className="px-7 pt-7 pb-5">
+        <div className="px-4 sm:px-7 pt-5 sm:pt-7 pb-4 sm:pb-5">
           {/* Status indicator */}
           <div className="flex items-center gap-2 mb-5">
             <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-900">
@@ -684,7 +684,7 @@ function AgencyHome() {
         </div>
 
         {/* Quick actions */}
-        <div className="grid grid-cols-5 border-t border-gray-100">
+        <div className="grid grid-cols-3 sm:grid-cols-5 border-t border-gray-100">
           {QUICK_ACTIONS.map(({ icon: Icon, label, description }) => (
             <button key={label}
               onClick={() => openWithQuery(description)}
@@ -700,7 +700,7 @@ function AgencyHome() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {mockKPIs.map((kpi) => (
           <div key={kpi.label} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
             <p className="text-[10px] font-medium text-gray-400 mb-1.5 truncate">{kpi.label}</p>

@@ -39,9 +39,9 @@ export default function ContactsPage() {
   );
 
   return (
-    <div className="flex h-full overflow-hidden">
+    <div className="flex h-full overflow-hidden flex-col md:flex-row">
       {/* Left panel */}
-      <div className="w-80 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col overflow-hidden">
+      <div className="w-full md:w-80 flex-shrink-0 border-b md:border-b-0 md:border-r border-gray-200 bg-white flex flex-col overflow-hidden max-h-64 md:max-h-none">
         {/* Search */}
         <div className="p-4 border-b border-gray-100">
           <div className="relative">
@@ -182,7 +182,7 @@ export default function ContactsPage() {
           </div>
 
           {/* Right sidebar */}
-          <div className="w-72 flex-shrink-0 flex flex-col gap-4">
+          <div className="w-full lg:w-72 flex-shrink-0 flex flex-col gap-4">
             {/* Summary card */}
             <div className="rounded-xl border border-gray-200 bg-white p-4">
               <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-3">Summary</h3>

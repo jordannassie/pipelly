@@ -3,24 +3,13 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  LayoutDashboard,
-  Users2,
-  MessageSquare,
-  Briefcase,
-  Settings,
-  HelpCircle,
-  Sparkles,
-  GitBranch,
-  Contact,
-  Inbox,
-  Zap,
-  BarChart3,
-  CheckSquare,
-  Building2,
-  LogOut,
+  LayoutDashboard, Users2, MessageSquare, Briefcase, Settings,
+  HelpCircle, Sparkles, GitBranch, Contact, Inbox, Zap,
+  BarChart3, CheckSquare, Building2, LogOut, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDashboardMode } from "@/lib/dashboard-mode-context";
+import { useSidebar } from "@/lib/sidebar-context";
 
 const agencyNav = [
   { label: "Home",        href: "/demo",             icon: LayoutDashboard },
@@ -43,7 +32,7 @@ const clientNav = [
   { label: "Settings", href: "/demo/settings", icon: Settings },
 ];
 
-export function AppSidebar() {
+function SidebarContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
   const { mode, setMode, hasChosen } = useDashboardMode();
@@ -59,19 +48,30 @@ export function AppSidebar() {
     if (newMode === mode) return;
     setMode(newMode);
     router.push("/demo");
+    onClose?.();
   };
 
+  const handleNav = () => onClose?.();
+
   return (
-    <aside className="flex h-full w-60 flex-col border-r border-gray-100 bg-white">
-      {/* Logo */}
+    <aside className="flex h-full w-64 flex-col border-r border-gray-100 bg-white">
+      {/* Logo + mobile close */}
       <div className="flex h-16 items-center gap-3 px-5 border-b border-gray-100">
-        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gray-900">
+        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gray-900 flex-shrink-0">
           <Sparkles className="h-4 w-4 text-white" />
         </div>
-        <div>
+        <div className="flex-1">
           <span className="text-sm font-bold tracking-tight text-gray-900">Pipelly</span>
           <span className="text-sm font-bold tracking-tight text-gray-400">.ai</span>
         </div>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-colors md:hidden"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       {/* Mode switcher */}
@@ -82,9 +82,7 @@ export function AppSidebar() {
               onClick={() => handleModeSwitch("agency")}
               className={cn(
                 "flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all",
-                mode === "agency"
-                  ? "bg-gray-900 text-white shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
+                mode === "agency" ? "bg-gray-900 text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
               )}
             >
               Agency
@@ -93,9 +91,7 @@ export function AppSidebar() {
               onClick={() => handleModeSwitch("client")}
               className={cn(
                 "flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all",
-                mode === "client"
-                  ? "bg-gray-900 text-white shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
+                mode === "client" ? "bg-gray-900 text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
               )}
             >
               Business
@@ -106,53 +102,36 @@ export function AppSidebar() {
 
       {/* Main nav */}
       <nav className="flex-1 px-4 py-4 overflow-y-auto">
-        <div className={cn("space-y-0.5", mode === "agency" ? "" : "space-y-1")}>
+        <div className="space-y-0.5">
           {nav.map(({ label, href, icon: Icon }) => (
             <Link
               key={href}
               href={href}
+              onClick={handleNav}
               className={cn(
-                "flex items-center gap-3 rounded-xl transition-colors",
-                mode === "agency"
-                  ? "px-3 py-2 text-sm font-medium"
-                  : "px-3.5 py-3 text-sm font-medium",
+                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive(href)
                   ? "bg-gray-900 text-white"
                   : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
               )}
             >
-              <Icon
-                className={cn(
-                  "flex-shrink-0",
-                  mode === "agency" ? "h-4 w-4" : "h-5 w-5",
-                  isActive(href) ? "text-white" : "text-gray-400"
-                )}
-              />
+              <Icon className={cn("h-4 w-4 flex-shrink-0", isActive(href) ? "text-white" : "text-gray-400")} />
               {label}
-              {/* Agency-only: subtle complexity indicator */}
               {mode === "agency" && label === "Automations" && (
-                <span className="ml-auto rounded-full bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 border border-emerald-100">
-                  AI
-                </span>
+                <span className="ml-auto rounded-full bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 border border-emerald-100">AI</span>
               )}
               {mode === "agency" && label === "Analytics" && (
-                <span className="ml-auto rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100">
-                  Live
-                </span>
+                <span className="ml-auto rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100">Live</span>
               )}
             </Link>
           ))}
         </div>
 
-        {/* Agency: section label */}
         {mode === "agency" && (
           <div className="mt-5 px-3">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-300 mb-1.5">Workspaces</p>
             {["Apex Growth", "Northstar Media", "Elevate Roofing"].map((ws) => (
-              <button
-                key={ws}
-                className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-gray-400 hover:bg-gray-50 hover:text-gray-700 transition-colors"
-              >
+              <button key={ws} onClick={handleNav} className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-gray-400 hover:bg-gray-50 hover:text-gray-700 transition-colors">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shrink-0" />
                 {ws}
               </button>
@@ -161,8 +140,8 @@ export function AppSidebar() {
         )}
       </nav>
 
-      {/* Bottom */}
-      <div className="px-4 py-4 border-t border-gray-100 space-y-0.5">
+      {/* Bottom utilities */}
+      <div className="px-4 py-3 border-t border-gray-100 space-y-0.5">
         <button className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-colors">
           <HelpCircle className="h-4 w-4 text-gray-400" />
           Help
@@ -171,15 +150,11 @@ export function AppSidebar() {
 
       {/* User + Logout */}
       <div className="border-t border-gray-100 px-4 py-3">
-        <div className="flex items-center gap-3 rounded-xl px-3 py-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white flex-shrink-0">
-            JN
-          </div>
-          <div className="flex-1 min-w-0 text-left">
+        <div className="flex items-center gap-3 rounded-xl px-3 py-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white flex-shrink-0">JN</div>
+          <div className="flex-1 min-w-0">
             <p className="truncate text-sm font-semibold text-gray-900">Jordan Nassie</p>
-            <p className="truncate text-xs text-gray-400">
-              {mode === "agency" ? "Admin · Agency" : "Owner · Business"}
-            </p>
+            <p className="truncate text-xs text-gray-400">{mode === "agency" ? "Admin · Agency" : "Owner · Business"}</p>
           </div>
         </div>
         <button
@@ -191,5 +166,31 @@ export function AppSidebar() {
         </button>
       </div>
     </aside>
+  );
+}
+
+export function AppSidebar() {
+  const { mobileOpen, setMobileOpen } = useSidebar();
+
+  return (
+    <>
+      {/* Desktop sidebar — always visible */}
+      <div className="hidden md:flex h-full flex-shrink-0">
+        <SidebarContent />
+      </div>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm md:hidden"
+            onClick={() => setMobileOpen(false)}
+          />
+          <div className="fixed inset-y-0 left-0 z-50 md:hidden" style={{ animation: "slideInLeft 0.2s ease-out" }}>
+            <SidebarContent onClose={() => setMobileOpen(false)} />
+          </div>
+        </>
+      )}
+    </>
   );
 }

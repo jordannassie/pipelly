@@ -638,7 +638,7 @@ export function AICopilotPanel() {
             onClick={() => setOpen(false)}
           />
 
-          <div className="fixed top-0 right-0 z-50 flex h-screen w-[400px] flex-col border-l border-gray-200 bg-white shadow-2xl overflow-hidden" style={{ animation: "slideInRight 0.2s ease-out" }}>
+          <div className="fixed top-0 right-0 z-50 flex h-screen w-full sm:w-[400px] flex-col border-l border-gray-200 bg-white shadow-2xl overflow-hidden" style={{ animation: "slideInRight 0.2s ease-out" }}>
 
           {/* Header */}
           <div className="flex items-center gap-2 border-b border-gray-800 bg-gray-900 px-4 py-3.5 shrink-0">

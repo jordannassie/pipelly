@@ -2,10 +2,11 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-import { Search, Plus, Sparkles, Bell, HelpCircle, LogOut, Settings, ChevronDown } from "lucide-react";
+import { Search, Plus, Sparkles, Bell, HelpCircle, LogOut, Settings, ChevronDown, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDashboardMode } from "@/lib/dashboard-mode-context";
 import { useAICopilot } from "@/lib/ai-copilot-context";
+import { useSidebar } from "@/lib/sidebar-context";
 
 const PAGE_META: Record<string, { title: string; breadcrumb: string[] }> = {
   "/demo":              { title: "Home",          breadcrumb: [] },
@@ -52,6 +53,7 @@ export function AppTopbar() {
   const router = useRouter();
   const { mode } = useDashboardMode();
   const { setOpen } = useAICopilot();
+  const { toggle: toggleSidebar } = useSidebar();
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
@@ -75,7 +77,16 @@ export function AppTopbar() {
   };
 
   return (
-    <header className="flex h-14 items-center gap-4 border-b border-gray-100 bg-white px-5">
+    <header className="flex h-14 items-center gap-2 border-b border-gray-100 bg-white px-4 md:px-5">
+      {/* Hamburger — mobile only */}
+      <button
+        onClick={toggleSidebar}
+        className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-50 transition-colors md:hidden flex-shrink-0"
+        aria-label="Open menu"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
       {/* Breadcrumb / Title */}
       <div className="flex items-center gap-1.5 text-sm shrink-0">
         {meta.breadcrumb.length > 0 ? (
@@ -95,8 +106,8 @@ export function AppTopbar() {
         )}
       </div>
 
-      {/* Search */}
-      <div className="relative ml-2 flex-1 max-w-xs">
+      {/* Search — hidden on mobile */}
+      <div className="relative ml-2 hidden sm:block flex-1 max-w-xs">
         <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
         <input
           type="text"
@@ -108,19 +119,19 @@ export function AppTopbar() {
         </kbd>
       </div>
 
-      <div className="ml-auto flex items-center gap-2">
-        {/* Plus */}
-        <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-colors">
+      <div className="ml-auto flex items-center gap-1.5 md:gap-2">
+        {/* Plus — hidden on mobile */}
+        <button className="hidden sm:flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-colors">
           <Plus className="h-4 w-4" />
         </button>
 
         {/* AI action */}
         <button
           onClick={() => setOpen(true)}
-          className="flex h-8 items-center gap-1.5 rounded-lg bg-gray-900 pl-3 pr-3.5 text-xs font-medium text-white hover:bg-gray-800 transition-colors"
+          className="flex h-8 items-center gap-1.5 rounded-lg bg-gray-900 pl-2.5 pr-3 text-xs font-medium text-white hover:bg-gray-800 transition-colors"
         >
           <Sparkles className="h-3.5 w-3.5" />
-          <span className="hidden sm:block max-w-[180px] truncate">{aiHint}</span>
+          <span className="hidden sm:block max-w-[160px] truncate">{aiHint}</span>
           <span className="block sm:hidden">AI</span>
         </button>
 
@@ -130,8 +141,8 @@ export function AppTopbar() {
           <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
         </button>
 
-        {/* Help */}
-        <button className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-50 transition-colors">
+        {/* Help — hidden on mobile */}
+        <button className="hidden sm:flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-50 transition-colors">
           <HelpCircle className="h-4 w-4" />
         </button>
 
