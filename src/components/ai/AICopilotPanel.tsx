@@ -22,6 +22,7 @@ interface AIMessage {
 
 // ── Context suggestions per page ───────────────────────────────────────────
 const PAGE_SUGGESTIONS: Record<string, { label: string; query: string }[]> = {
+  // Legacy /demo routes
   "/demo": [
     { label: "Analyze pipeline", query: "Analyze my pipeline" },
     { label: "Draft outreach", query: "Draft outreach for my top leads" },
@@ -76,18 +77,106 @@ const PAGE_SUGGESTIONS: Record<string, { label: string; query: string }[]> = {
     { label: "Draft outreach", query: "Draft outreach for priority leads" },
     { label: "Recommend automations", query: "Recommend automations to reduce manual tasks" },
   ],
+  // Agency routes
+  "/demo/agency": [
+    { label: "Create new workspace", query: "Create a new client workspace" },
+    { label: "Show clients needing attention", query: "Which clients need attention?" },
+    { label: "Summarize setup progress", query: "Summarize the current setup queue" },
+    { label: "Recommend next action", query: "What should I focus on for my agency today?" },
+  ],
+  "/demo/agency/clients": [
+    { label: "Summarize workspace health", query: "Summarize the health of all client workspaces" },
+    { label: "Find inactive accounts", query: "Which client accounts have been inactive?" },
+    { label: "Suggest upsell opportunities", query: "Which clients are candidates for upsell?" },
+    { label: "Create new workspace", query: "Create a new client workspace" },
+  ],
+  "/demo/agency/setup": [
+    { label: "Auto-fill setup details", query: "Auto-fill the current setup step with AI" },
+    { label: "Show pending setups", query: "What setups are pending or stalled?" },
+    { label: "Next setup step", query: "What is the next recommended setup step?" },
+    { label: "Draft welcome email", query: "Draft a welcome email for the new client" },
+  ],
+  // Business routes
+  "/demo/business": [
+    { label: "What should I focus on?", query: "What should I focus on today?" },
+    { label: "Show hottest leads", query: "Show my hottest opportunities" },
+    { label: "What follow-ups are overdue?", query: "Which follow-ups are overdue?" },
+    { label: "Analyze my pipeline", query: "Analyze my pipeline" },
+  ],
+  "/demo/business/leads": [
+    { label: "Score these leads", query: "Draft outreach for top leads" },
+    { label: "Draft outreach", query: "Draft outreach for my hottest leads" },
+    { label: "Find hottest leads", query: "Who are my hottest leads right now?" },
+    { label: "Generate follow-ups", query: "Generate follow-up tasks for cold leads" },
+  ],
+  "/demo/business/pipeline": [
+    { label: "Why are deals stuck?", query: "Analyze my pipeline" },
+    { label: "Recommend follow-ups", query: "Generate follow-up tasks from my deals" },
+    { label: "Generate tasks", query: "Generate follow-up tasks from pipeline" },
+    { label: "Draft outreach", query: "Draft outreach for stuck deals" },
+  ],
+  "/demo/business/contacts": [
+    { label: "Summarize this contact", query: "Summarize contact Marcus Reid" },
+    { label: "Draft follow-up", query: "Draft outreach for Marcus Reid" },
+    { label: "Recommend automations", query: "Recommend automations for contact management" },
+    { label: "Generate next steps", query: "Generate follow-up tasks for this contact" },
+  ],
+  "/demo/business/messages": [
+    { label: "Summarize thread", query: "Draft outreach reply to Marcus Reid" },
+    { label: "Draft reply", query: "Draft outreach reply to top thread" },
+    { label: "Suggest next response", query: "What should I say next?" },
+    { label: "Generate follow-up tasks", query: "Generate follow-up tasks from inbox threads" },
+  ],
+  "/demo/business/calendar": [
+    { label: "Show open slots", query: "What are my open scheduling slots this week?" },
+    { label: "Schedule follow-up", query: "Schedule a follow-up call with my top lead" },
+    { label: "Add booked lead to calendar", query: "Add the booked lead to my calendar" },
+    { label: "Block off job time", query: "Block off time for the upcoming job" },
+  ],
+  "/demo/business/automations": [
+    { label: "Recommend automations", query: "Recommend automations for my pipeline" },
+    { label: "Analyze pipeline", query: "Analyze my pipeline" },
+    { label: "Generate tasks", query: "Generate follow-up tasks" },
+    { label: "Build follow-up automation", query: "Recommend automations for follow-up" },
+  ],
+  "/demo/business/analytics": [
+    { label: "Analyze pipeline", query: "Analyze my pipeline" },
+    { label: "What changed this week?", query: "Analyze my pipeline" },
+    { label: "Generate tasks from data", query: "Generate follow-up tasks from pipeline" },
+    { label: "Recommend automations", query: "Recommend automations based on my data" },
+  ],
+  "/demo/business/tasks": [
+    { label: "Prioritize my tasks", query: "Generate follow-up tasks from my pipeline" },
+    { label: "Generate tasks from pipeline", query: "Generate follow-up tasks from my deals" },
+    { label: "Draft outreach", query: "Draft outreach for priority leads" },
+    { label: "Recommend automations", query: "Recommend automations to reduce manual tasks" },
+  ],
 };
 
 const PAGE_GREETINGS: Record<string, string> = {
-  "/demo":           "I can see your full system. What would you like me to do?",
-  "/demo/leads":     "I can see your 312 leads. Want me to score them, draft outreach, or find similar ones?",
-  "/demo/pipeline":  "Your pipeline has $74.3k in 8 open deals. 3 haven't had activity in 7+ days — want me to flag those?",
-  "/demo/contacts":  "I can summarize any contact, draft a message, or suggest your next step. Just ask.",
-  "/demo/workspaces":"You have 5 active workspaces. Elevate Roofing is your top performer. Want me to analyze or create a new one?",
-  "/demo/inbox":     "You have 2 unread threads. Marcus Reid replied to your proposal — that one looks high priority.",
-  "/demo/automations":"I can build any automation in plain English — or recommend ones based on your pipeline.",
-  "/demo/analytics": "I've analyzed your last 30 days. Lead volume is up 18%, but booked calls dropped slightly.",
-  "/demo/tasks":     "You have 8 tasks — 2 are overdue. Want me to prioritize them and generate a plan for today?",
+  "/demo":                    "I can see your full system. What would you like me to do?",
+  "/demo/leads":              "I can see your 312 leads. Want me to score them, draft outreach, or find similar ones?",
+  "/demo/pipeline":           "Your pipeline has $74.3k in 8 open deals. 3 haven't had activity in 7+ days — want me to flag those?",
+  "/demo/contacts":           "I can summarize any contact, draft a message, or suggest your next step. Just ask.",
+  "/demo/workspaces":         "You have 5 active workspaces. Elevate Roofing is your top performer. Want me to analyze or create a new one?",
+  "/demo/inbox":              "You have 2 unread threads. Marcus Reid replied to your proposal — that one looks high priority.",
+  "/demo/automations":        "I can build any automation in plain English — or recommend ones based on your pipeline.",
+  "/demo/analytics":          "I've analyzed your last 30 days. Lead volume is up 18%, but booked calls dropped slightly.",
+  "/demo/tasks":              "You have 8 tasks — 2 are overdue. Want me to prioritize them and generate a plan for today?",
+  // Agency
+  "/demo/agency":             "I can see your 5 client workspaces. 1 is flagged, 2 setups are in progress. What would you like to do?",
+  "/demo/agency/clients":     "All 5 client accounts are visible. Elevate Solar is flagged — admin invite still pending.",
+  "/demo/agency/setup":       "3 setups in queue. BrightPath is furthest along. Want me to auto-fill the next step?",
+  // Business
+  "/demo/business":           "Good morning! You have 4 tasks today and 3 leads that need a follow-up. Ready to help.",
+  "/demo/business/leads":     "You have 312 leads. 12 have gone quiet — want me to draft re-engagement outreach?",
+  "/demo/business/pipeline":  "Your pipeline has $74.3k across 8 deals. 3 deals haven't had activity in 7+ days.",
+  "/demo/business/contacts":  "I can summarize any contact, draft a follow-up, or recommend next steps. Just ask.",
+  "/demo/business/messages":  "You have 2 unread threads. One is a high-priority reply from Marcus Reid.",
+  "/demo/business/calendar":  "You have 4 appointments today. Your first is a 9 AM estimate call with Brian Walters.",
+  "/demo/business/automations":"I can build automations in plain English. Just describe what you want to happen.",
+  "/demo/business/analytics": "Lead volume is up 18% but booked calls dropped 3%. Want me to diagnose the drop?",
+  "/demo/business/tasks":     "You have 8 tasks — 2 are overdue. Want me to prioritize and draft a plan for today?",
 };
 
 // ── Rich result card components ────────────────────────────────────────────

@@ -219,3 +219,126 @@ export const mockInvoices: Invoice[] = [
   { id: "inv-003", date: "2026-02-01", amount: 297, status: "paid" },
   { id: "inv-004", date: "2026-01-01", amount: 197, status: "paid" },
 ];
+
+// ── Agency Client Accounts ─────────────────────────────────────────────────
+export interface AgencyClient {
+  id: string;
+  name: string;
+  industry: string;
+  adminUser: string;
+  adminEmail: string;
+  setupStatus: "launched" | "in_progress" | "pending";
+  health: "excellent" | "good" | "needs_attention" | "flagged";
+  leads: number;
+  revenue: number;
+  lastActivity: string;
+  avatar: string;
+  color: string;
+}
+
+export const mockAgencyClients: AgencyClient[] = [
+  {
+    id: "ac-1",
+    name: "Apex Roofing",
+    industry: "Home Services",
+    adminUser: "Mike Chen",
+    adminEmail: "mike@apexroofing.com",
+    setupStatus: "launched",
+    health: "excellent",
+    leads: 207,
+    revenue: 72000,
+    lastActivity: "2 hours ago",
+    avatar: "AR",
+    color: "bg-emerald-500",
+  },
+  {
+    id: "ac-2",
+    name: "BrightPath Plumbing",
+    industry: "Plumbing",
+    adminUser: "Sara Lee",
+    adminEmail: "sara@brightpath.com",
+    setupStatus: "in_progress",
+    health: "good",
+    leads: 84,
+    revenue: 31500,
+    lastActivity: "1 day ago",
+    avatar: "BP",
+    color: "bg-blue-500",
+  },
+  {
+    id: "ac-3",
+    name: "Northstar Med Spa",
+    industry: "Medical Aesthetics",
+    adminUser: "Dr. Priya Shah",
+    adminEmail: "priya@northstarmedspa.com",
+    setupStatus: "in_progress",
+    health: "needs_attention",
+    leads: 63,
+    revenue: 48000,
+    lastActivity: "3 days ago",
+    avatar: "NS",
+    color: "bg-violet-500",
+  },
+  {
+    id: "ac-4",
+    name: "Elevate Solar",
+    industry: "Solar Energy",
+    adminUser: "Tom Rivera",
+    adminEmail: "tom@elevatesolar.com",
+    setupStatus: "pending",
+    health: "flagged",
+    leads: 12,
+    revenue: 0,
+    lastActivity: "5 days ago",
+    avatar: "ES",
+    color: "bg-amber-500",
+  },
+  {
+    id: "ac-5",
+    name: "Greenleaf Landscaping",
+    industry: "Landscaping",
+    adminUser: "Amy Brooks",
+    adminEmail: "amy@greenleaf.com",
+    setupStatus: "launched",
+    health: "good",
+    leads: 119,
+    revenue: 27800,
+    lastActivity: "4 hours ago",
+    avatar: "GL",
+    color: "bg-teal-500",
+  },
+];
+
+export interface SetupQueueItem {
+  id: string;
+  client: string;
+  status: string;
+  step: string;
+  assignee: string;
+  updatedAt: string;
+}
+
+export const mockSetupQueue: SetupQueueItem[] = [
+  { id: "sq-1", client: "Elevate Solar", status: "pending", step: "Awaiting admin invite", assignee: "Jordan N.", updatedAt: "5 days ago" },
+  { id: "sq-2", client: "BrightPath Plumbing", status: "in_progress", step: "Connecting calendar integration", assignee: "Jordan N.", updatedAt: "1 day ago" },
+  { id: "sq-3", client: "Northstar Med Spa", status: "in_progress", step: "Configuring pipeline stages", assignee: "Ava T.", updatedAt: "2 days ago" },
+];
+
+// ── Business Calendar Events ───────────────────────────────────────────────
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  time: string;
+  duration: string;
+  type: "call" | "estimate" | "job" | "followup" | "meeting";
+  contact: string;
+  address?: string;
+  notes?: string;
+}
+
+export const mockCalendarEvents: CalendarEvent[] = [
+  { id: "ce-1", title: "Estimate call — Brian Walters", time: "9:00 AM", duration: "30 min", type: "estimate", contact: "Brian Walters", notes: "Roof replacement quote" },
+  { id: "ce-2", title: "Job: Replace gutters — Donna P.", time: "11:00 AM", duration: "2 hrs", type: "job", contact: "Donna Park", address: "284 Elmwood Dr" },
+  { id: "ce-3", title: "Follow-up call — Carlos M.", time: "2:00 PM", duration: "15 min", type: "followup", contact: "Carlos Mendez", notes: "Estimate was sent 3 days ago" },
+  { id: "ce-4", title: "New lead intake — Sandra H.", time: "4:00 PM", duration: "20 min", type: "call", contact: "Sandra Hill", notes: "Referred by Brian Walters" },
+];
