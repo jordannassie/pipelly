@@ -1,7 +1,8 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { Search, Plus, Sparkles, Bell, HelpCircle } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useRef, useEffect } from "react";
+import { Search, Plus, Sparkles, Bell, HelpCircle, LogOut, Settings, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDashboardMode } from "@/lib/dashboard-mode-context";
 import { useAICopilot } from "@/lib/ai-copilot-context";
@@ -48,12 +49,30 @@ const AI_HINTS: Record<"agency" | "client", Record<string, string>> = {
 
 export function AppTopbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { mode } = useDashboardMode();
   const { setOpen } = useAICopilot();
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
 
   const meta = PAGE_META[pathname] ?? { title: "Pipelly", breadcrumb: [] };
   const hints = AI_HINTS[mode] ?? AI_HINTS.client;
   const aiHint = hints[pathname] ?? "Ask AI";
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("pipelly_mode");
+    router.push("/login");
+  };
 
   return (
     <header className="flex h-14 items-center gap-4 border-b border-gray-100 bg-white px-5">
@@ -116,9 +135,42 @@ export function AppTopbar() {
           <HelpCircle className="h-4 w-4" />
         </button>
 
-        {/* Avatar */}
-        <div className="ml-0.5 flex h-7 w-7 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white ring-2 ring-gray-100">
-          JN
+        {/* Profile dropdown */}
+        <div className="relative ml-0.5" ref={profileRef}>
+          <button
+            onClick={() => setProfileOpen((o) => !o)}
+            className="flex items-center gap-1 rounded-lg hover:bg-gray-50 px-1 py-0.5 transition-colors"
+          >
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white ring-2 ring-gray-100">
+              JN
+            </div>
+            <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
+          </button>
+
+          {profileOpen && (
+            <div className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-gray-200 bg-white shadow-lg z-50 overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-100">
+                <p className="text-sm font-semibold text-gray-900">Jordan Nassie</p>
+                <p className="text-xs text-gray-500">jordan@daily.church</p>
+              </div>
+              <div className="p-1.5">
+                <button
+                  onClick={() => { setProfileOpen(false); router.push("/demo/settings"); }}
+                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <Settings className="h-4 w-4 text-gray-400" />
+                  Settings
+                </button>
+                <button
+                  onClick={() => { setProfileOpen(false); handleLogout(); }}
+                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Log out
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>

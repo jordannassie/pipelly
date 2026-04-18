@@ -17,6 +17,7 @@ import {
   BarChart3,
   CheckSquare,
   Building2,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDashboardMode } from "@/lib/dashboard-mode-context";
@@ -168,9 +169,9 @@ export function AppSidebar() {
         </button>
       </div>
 
-      {/* User */}
-      <div className="border-t border-gray-100 px-4 py-4">
-        <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-gray-50 transition-colors">
+      {/* User + Logout */}
+      <div className="border-t border-gray-100 px-4 py-3">
+        <div className="flex items-center gap-3 rounded-xl px-3 py-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white flex-shrink-0">
             JN
           </div>
@@ -180,6 +181,13 @@ export function AppSidebar() {
               {mode === "agency" ? "Admin · Agency" : "Owner · Business"}
             </p>
           </div>
+        </div>
+        <button
+          onClick={() => { localStorage.removeItem("pipelly_mode"); router.push("/login"); }}
+          className="mt-1 flex w-full items-center gap-3 rounded-xl px-3.5 py-2 text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors"
+        >
+          <LogOut className="h-4 w-4 flex-shrink-0" />
+          Log out
         </button>
       </div>
     </aside>
