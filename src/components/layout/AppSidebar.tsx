@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Users2, MessageSquare, Briefcase, Settings,
   HelpCircle, Sparkles, GitBranch, Contact, Inbox, Zap,
-  BarChart3, CheckSquare, Building2, LogOut, X,
+  BarChart3, CheckSquare, Building2, LogOut, X, Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDashboardMode } from "@/lib/dashboard-mode-context";
@@ -13,15 +13,16 @@ import { useSidebar } from "@/lib/sidebar-context";
 
 // Business mode — full daily operating system for one business
 const agencyNav = [
-  { label: "Home",        href: "/demo",             icon: LayoutDashboard },
-  { label: "Leads",       href: "/demo/leads",       icon: Users2 },
-  { label: "Pipeline",    href: "/demo/pipeline",    icon: GitBranch },
-  { label: "Contacts",    href: "/demo/contacts",    icon: Contact },
-  { label: "Inbox",       href: "/demo/inbox",       icon: Inbox },
-  { label: "Automations", href: "/demo/automations", icon: Zap },
-  { label: "Analytics",   href: "/demo/analytics",   icon: BarChart3 },
-  { label: "Tasks",       href: "/demo/tasks",       icon: CheckSquare },
-  { label: "Settings",    href: "/demo/settings",    icon: Settings },
+  { label: "Home",        href: "/demo",              icon: LayoutDashboard },
+  { label: "Leads",       href: "/demo/leads",        icon: Users2 },
+  { label: "Pipeline",    href: "/demo/pipeline",     icon: GitBranch },
+  { label: "Contacts",    href: "/demo/contacts",     icon: Contact },
+  { label: "Inbox",       href: "/demo/inbox",        icon: Inbox },
+  { label: "Automations", href: "/demo/automations",  icon: Zap },
+  { label: "AI Agent",    href: "/demo/ai-agent",     icon: Bot },
+  { label: "Analytics",   href: "/demo/analytics",    icon: BarChart3 },
+  { label: "Tasks",       href: "/demo/tasks",        icon: CheckSquare },
+  { label: "Settings",    href: "/demo/settings",     icon: Settings },
 ];
 
 // Agency mode — multi-client portfolio control center
@@ -120,6 +121,9 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
               {label}
               {mode === "client" && label === "Automations" && (
                 <span className="ml-auto rounded-full bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 border border-emerald-100">AI</span>
+              )}
+              {mode === "client" && label === "AI Agent" && (
+                <span className="ml-auto rounded-full bg-violet-50 px-1.5 py-0.5 text-[9px] font-bold text-violet-600 border border-violet-100">NEW</span>
               )}
               {mode === "client" && label === "Analytics" && (
                 <span className="ml-auto rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100">Live</span>

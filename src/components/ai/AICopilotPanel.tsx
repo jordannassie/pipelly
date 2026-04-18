@@ -620,7 +620,7 @@ export function AICopilotPanel() {
       {/* Header */}
       <div className="flex items-center gap-2 border-b border-gray-800 bg-gray-900 px-4 py-3.5 shrink-0">
         <Sparkles className="h-4 w-4 text-white" />
-        <span className="text-sm font-semibold text-white">AI Copilot</span>
+        <span className="text-sm font-semibold text-white">AI Agent</span>
         <span className="flex items-center gap-1 rounded-full bg-emerald-400/20 border border-emerald-500/30 px-2 py-0.5 text-[9px] font-bold text-emerald-300">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />LIVE
         </span>
@@ -651,7 +651,7 @@ export function AICopilotPanel() {
                 <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-900">
                   <Sparkles className="h-3 w-3 text-white" />
                 </div>
-                <span className="text-[10px] font-medium text-gray-500">Pipelly AI · {formatTime(m.timestamp)}</span>
+                    <span className="text-[10px] font-medium text-gray-500">Pipelly Agent · {formatTime(m.timestamp)}</span>
               </div>
             )}
             {m.card ? (
@@ -734,7 +734,7 @@ export function AICopilotPanel() {
           <button
             onClick={openCopilot}
             className="group flex flex-1 flex-col items-center gap-3 py-5 w-full hover:bg-gray-50 transition-colors"
-            aria-label="Open AI Copilot"
+            aria-label="Open AI Agent"
           >
             {/* Icon */}
             <div className="relative flex-shrink-0">
@@ -750,7 +750,7 @@ export function AICopilotPanel() {
               className="text-[10px] font-semibold text-gray-400 group-hover:text-gray-700 transition-colors tracking-widest uppercase"
               style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
             >
-              AI Copilot
+              AI Agent
             </span>
             {/* Live dot */}
             <span className="flex-shrink-0 h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -772,7 +772,7 @@ export function AICopilotPanel() {
         <button
           onClick={openCopilot}
           className="fixed bottom-6 right-6 z-50 md:hidden"
-          aria-label="Open AI Copilot"
+          aria-label="Open AI Agent"
         >
           <span className="absolute inset-0 rounded-full bg-gray-700 animate-ping opacity-20" />
           <span className="relative flex h-12 w-12 items-center justify-center rounded-full bg-gray-900 text-white shadow-xl hover:bg-gray-800 transition-all hover:scale-105 active:scale-95">
