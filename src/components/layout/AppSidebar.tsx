@@ -37,7 +37,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
   const router = useRouter();
   const { mode, setMode, userType } = useDashboardMode();
 
-  const nav = mode === "agency" ? agencyNav : clientNav;
+  const nav = mode === "client" ? agencyNav : clientNav;
 
   const isActive = (href: string) => {
     if (href === "/demo") return pathname === "/demo";
@@ -118,17 +118,17 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
             >
               <Icon className={cn("h-4 w-4 flex-shrink-0", isActive(href) ? "text-white" : "text-gray-400")} />
               {label}
-              {mode === "agency" && label === "Automations" && (
+              {mode === "client" && label === "Automations" && (
                 <span className="ml-auto rounded-full bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 border border-emerald-100">AI</span>
               )}
-              {mode === "agency" && label === "Analytics" && (
+              {mode === "client" && label === "Analytics" && (
                 <span className="ml-auto rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100">Live</span>
               )}
             </Link>
           ))}
         </div>
 
-        {mode === "agency" && (
+        {mode === "client" && (
           <div className="mt-5 px-3">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-300 mb-1.5">Workspaces</p>
             {["Apex Growth", "Northstar Media", "Elevate Roofing"].map((ws) => (

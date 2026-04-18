@@ -836,6 +836,6 @@ export default function HomePage() {
   }
 
   if (!hasChosen) return <EntryChooser onChoose={setMode} />;
-  if (mode === "agency") return <AgencyHome />;
+  if (mode === "client") return <AgencyHome />;
   return <ClientHome />;
 }
