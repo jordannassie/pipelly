@@ -29,10 +29,56 @@ const PAGE_SUGGESTIONS: Record<string, { label: string; query: string }[]> = {
     { label: "What jobs are waiting on me?",       query: "What jobs are waiting on me?" },
   ],
   "/demo/agency": [
-    { label: "Analyze pipeline",                   query: "Analyze my pipeline" },
-    { label: "Draft outreach",                     query: "Draft outreach for my top leads" },
-    { label: "Generate tasks",                     query: "Generate follow-up tasks from my pipeline" },
-    { label: "Recommend automations",              query: "Recommend automations for my workflow" },
+    { label: "Create a new business workspace",    query: "Create a new business workspace" },
+    { label: "Show setups in progress",            query: "Show setups in progress" },
+    { label: "Which clients need attention?",      query: "Which clients need attention?" },
+    { label: "Assign admin user",                  query: "Assign an admin user to a business" },
+  ],
+  "/demo/agency/clients": [
+    { label: "Which clients need attention?",      query: "Which clients need attention?" },
+    { label: "Open a workspace",                   query: "Open a business workspace" },
+    { label: "Show healthy accounts",              query: "Show my healthy accounts" },
+    { label: "Create new workspace",               query: "Create a new business workspace" },
+  ],
+  "/demo/agency/setup": [
+    { label: "What's needed to launch?",           query: "What steps are needed to launch a workspace?" },
+    { label: "Check setup status",                 query: "Show setups in progress" },
+  ],
+  "/demo/business": [
+    { label: "Who needs a follow-up today?",       query: "Who do I need to follow up with today?" },
+    { label: "Write a reply for a lead",           query: "Write a text reply for my top lead" },
+    { label: "Show my hottest leads",              query: "Show my hottest leads" },
+    { label: "What jobs are waiting on me?",       query: "What jobs are waiting on me?" },
+  ],
+  "/demo/business/leads": [
+    { label: "Show my hottest leads",              query: "Show my hottest leads" },
+    { label: "Who needs a follow-up?",             query: "Who needs a follow-up today?" },
+    { label: "Which estimates haven't replied?",   query: "Which estimates have not been answered?" },
+    { label: "Write a follow-up text",             query: "Write a text reply for my top lead" },
+  ],
+  "/demo/business/messages": [
+    { label: "Write a reply for Dave",             query: "Write a text reply for Dave Mitchell about his roof inquiry" },
+    { label: "Summarize my messages",              query: "Summarize my recent messages" },
+    { label: "Draft a follow-up",                  query: "Draft a follow-up message for my unanswered leads" },
+    { label: "Who replied today?",                 query: "Who replied to my messages today?" },
+  ],
+  "/demo/business/jobs": [
+    { label: "Which estimates haven't replied?",   query: "Which estimates have not been answered?" },
+    { label: "What jobs are booked this week?",    query: "What jobs are waiting on me?" },
+    { label: "Follow up on pending estimates",     query: "Draft outreach for leads with unanswered estimates" },
+    { label: "Who needs payment collected?",       query: "Generate follow-up tasks for completed jobs" },
+  ],
+  "/demo/business/calendar": [
+    { label: "What's on this week?",               query: "What's on my calendar this week?" },
+    { label: "Schedule a confirmation",            query: "Send a confirmation for tomorrow's appointment" },
+    { label: "Block off time",                     query: "Block off Monday morning" },
+    { label: "Send a reminder",                    query: "Send a reminder to my next customer" },
+  ],
+  "/demo/business/settings": [
+    { label: "Help with notifications",            query: "How do I set up notifications?" },
+    { label: "Add a team member",                  query: "How do I invite a team member?" },
+    { label: "Connect Google Calendar",            query: "How do I connect Google Calendar?" },
+    { label: "Explain my plan",                    query: "Explain my current billing plan" },
   ],
   "/demo/client": [
     { label: "Who needs a follow-up today?",       query: "Who do I need to follow up with today?" },
@@ -109,20 +155,30 @@ const PAGE_SUGGESTIONS: Record<string, { label: string; query: string }[]> = {
 };
 
 const PAGE_GREETINGS: Record<string, string> = {
-  "/demo":            "Hey Jordan! You have 4 follow-ups due today and 12 new leads. What would you like help with?",
-  "/demo/agency":     "I can see your full system. What would you like me to do?",
-  "/demo/client":     "Hey Jordan! You have 4 follow-ups due today and 12 new leads. What would you like help with?",
-  "/demo/leads":      "I can see your 10 leads. 3 quotes haven't been answered in 5+ days — want me to write follow-up texts?",
-  "/demo/messages":   "You have 2 unread messages. Dave Mitchell just asked about roof availability. Want me to draft a reply?",
-  "/demo/jobs":       "You have 13 jobs across 6 stages. 3 estimates haven't had a response — should I follow up?",
-  "/demo/settings":   "I can help you with notifications, team access, billing, or integrations. What do you need?",
-  "/demo/pipeline":   "Your pipeline has $74.3k in 8 open deals. 3 haven't had activity in 7+ days — want me to flag those?",
-  "/demo/contacts":   "I can summarize any contact, draft a message, or suggest your next step. Just ask.",
-  "/demo/workspaces": "You have 5 active workspaces. Elevate Roofing is your top performer. Want me to analyze or create a new one?",
-  "/demo/inbox":      "You have 2 unread threads. Marcus Reid replied to your proposal — that one looks high priority.",
-  "/demo/automations":"I can build any automation in plain English — or recommend ones based on your pipeline.",
-  "/demo/analytics":  "I've analyzed your last 30 days. Lead volume is up 18%, but booked calls dropped slightly.",
-  "/demo/tasks":      "You have 8 tasks — 2 are overdue. Want me to prioritize them and generate a plan for today?",
+  "/demo":                     "Loading your dashboard… just a sec.",
+  "/demo/agency":              "Hey Jordan! You have 5 business accounts. BrightPath Plumbing is waiting on an admin invite. What would you like to do?",
+  "/demo/agency/clients":      "You have 5 client workspaces. 1 needs attention. Want me to show which clients are behind?",
+  "/demo/agency/setup":        "I can walk you through creating a new business workspace step by step. Ready to start?",
+  "/demo/agency/settings":     "I can help you update your agency info, manage team access, or explain your billing plan.",
+  "/demo/business":            "Hey Jordan! You have 4 follow-ups due today and 12 new leads. What would you like help with?",
+  "/demo/business/leads":      "You have 12 leads. 3 quotes haven't been answered in 5+ days — want me to write follow-up texts?",
+  "/demo/business/messages":   "You have 2 unread messages. Dave Mitchell just asked about roof availability. Want me to draft a reply?",
+  "/demo/business/jobs":       "You have 13 jobs across 6 stages. 3 estimates haven't had a response — should I follow up?",
+  "/demo/business/calendar":   "You have 5 appointments this week. Tom's roof install is tomorrow — want me to send a confirmation?",
+  "/demo/business/settings":   "I can help you with notifications, team access, billing, or integrations. What do you need?",
+  "/demo/business/contacts":   "I can summarize any contact, draft a follow-up text, or suggest your next step. Just ask.",
+  "/demo/client":              "Hey Jordan! You have 4 follow-ups due today and 12 new leads. What would you like help with?",
+  "/demo/leads":               "I can see your 10 leads. 3 quotes haven't been answered in 5+ days — want me to write follow-up texts?",
+  "/demo/messages":            "You have 2 unread messages. Dave Mitchell just asked about roof availability. Want me to draft a reply?",
+  "/demo/jobs":                "You have 13 jobs across 6 stages. 3 estimates haven't had a response — should I follow up?",
+  "/demo/settings":            "I can help you with notifications, team access, billing, or integrations. What do you need?",
+  "/demo/pipeline":            "Your pipeline has $74.3k in 8 open deals. 3 haven't had activity in 7+ days — want me to flag those?",
+  "/demo/contacts":            "I can summarize any contact, draft a message, or suggest your next step. Just ask.",
+  "/demo/workspaces":          "You have 5 active workspaces. Elevate Roofing is your top performer. Want me to analyze or create a new one?",
+  "/demo/inbox":               "You have 2 unread threads. Marcus Reid replied to your proposal — that one looks high priority.",
+  "/demo/automations":         "I can build any automation in plain English — or recommend ones based on your pipeline.",
+  "/demo/analytics":           "I've analyzed your last 30 days. Lead volume is up 18%, but booked calls dropped slightly.",
+  "/demo/tasks":               "You have 8 tasks — 2 are overdue. Want me to prioritize them and generate a plan for today?",
 };
 
 // ── Rich result card components ────────────────────────────────────────────
@@ -538,8 +594,15 @@ export function AICopilotPanel() {
   const inputRef = useRef<HTMLInputElement>(null);
   const lastPathRef = useRef(pathname);
 
-  const greeting = PAGE_GREETINGS[pathname] ?? PAGE_GREETINGS["/demo"];
-  const suggestions = PAGE_SUGGESTIONS[pathname] ?? PAGE_SUGGESTIONS["/demo"];
+  // Resolve page meta — exact match first, then longest prefix
+  const resolvePageKey = (record: Record<string, unknown>) => {
+    if (record[pathname]) return pathname;
+    return Object.keys(record)
+      .filter((k) => pathname.startsWith(k) && k !== "/demo")
+      .sort((a, b) => b.length - a.length)[0] ?? "/demo";
+  };
+  const greeting = PAGE_GREETINGS[resolvePageKey(PAGE_GREETINGS)] ?? PAGE_GREETINGS["/demo/business"];
+  const suggestions = PAGE_SUGGESTIONS[resolvePageKey(PAGE_SUGGESTIONS)] ?? PAGE_SUGGESTIONS["/demo/business"];
 
   const initMessages = useCallback(() => [
     { id: "init", role: "ai" as const, content: greeting, timestamp: new Date() },

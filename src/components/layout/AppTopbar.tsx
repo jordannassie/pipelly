@@ -1,130 +1,115 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Search, Plus, Sparkles, Bell, HelpCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useDashboardMode } from "@/lib/dashboard-mode-context";
+import { Bell, Search, Sparkles } from "lucide-react";
 import { useAICopilot } from "@/lib/ai-copilot-context";
 
-const PAGE_META: Record<string, { title: string; breadcrumb: string[] }> = {
-  "/demo":              { title: "Home",          breadcrumb: [] },
-  "/demo/agency":       { title: "Home",          breadcrumb: [] },
-  "/demo/client":       { title: "Home",          breadcrumb: [] },
-  "/demo/leads":        { title: "Leads",         breadcrumb: ["Leads"] },
-  "/demo/messages":     { title: "Messages",      breadcrumb: ["Messages"] },
-  "/demo/jobs":         { title: "Jobs",          breadcrumb: ["Jobs"] },
-  "/demo/workspaces":   { title: "Workspaces",    breadcrumb: ["Workspaces"] },
-  "/demo/pipeline":     { title: "Pipeline",      breadcrumb: ["Pipeline"] },
-  "/demo/contacts":     { title: "Contacts",      breadcrumb: ["Contacts"] },
-  "/demo/inbox":        { title: "Inbox",         breadcrumb: ["Inbox"] },
-  "/demo/automations":  { title: "Automations",   breadcrumb: ["Automations"] },
-  "/demo/analytics":    { title: "Analytics",     breadcrumb: ["Analytics"] },
-  "/demo/tasks":        { title: "Tasks",         breadcrumb: ["Tasks"] },
-  "/demo/settings":     { title: "Settings",      breadcrumb: ["Settings"] },
-  "/demo/settings/users":   { title: "Users",     breadcrumb: ["Settings", "Users"] },
-  "/demo/settings/billing": { title: "Billing",   breadcrumb: ["Settings", "Billing"] },
-  "/demo/onboarding":   { title: "Setup",         breadcrumb: ["Onboarding"] },
+type PageMeta = { title: string; breadcrumb: string[]; aiHint: string };
+
+const PAGE_META: Record<string, PageMeta> = {
+  // Agency routes
+  "/demo/agency":          { title: "Agency Home",    breadcrumb: [],                         aiHint: "Create a new business workspace"     },
+  "/demo/agency/clients":  { title: "Clients",        breadcrumb: ["Agency", "Clients"],       aiHint: "Which clients need attention?"       },
+  "/demo/agency/setup":    { title: "Setup",           breadcrumb: ["Agency", "Setup"],         aiHint: "Show setups in progress"             },
+  "/demo/agency/settings": { title: "Settings",        breadcrumb: ["Agency", "Settings"],      aiHint: "Update account settings"             },
+
+  // Business routes
+  "/demo/business":          { title: "Home",         breadcrumb: [],                          aiHint: "Who needs a follow-up today?"        },
+  "/demo/business/leads":    { title: "Leads",        breadcrumb: ["Leads"],                   aiHint: "Show my hottest leads"               },
+  "/demo/business/messages": { title: "Messages",     breadcrumb: ["Messages"],                aiHint: "Write a reply for this lead"         },
+  "/demo/business/jobs":     { title: "Jobs",         breadcrumb: ["Jobs"],                    aiHint: "What jobs are waiting on me?"        },
+  "/demo/business/calendar": { title: "Calendar",     breadcrumb: ["Calendar"],                aiHint: "What's on my calendar this week?"    },
+  "/demo/business/settings": { title: "Settings",     breadcrumb: ["Settings"],                aiHint: "Update my business settings"         },
+  "/demo/business/contacts": { title: "Contacts",     breadcrumb: ["Contacts"],                aiHint: "Find a contact"                      },
+
+  // Legacy / unchanged routes
+  "/demo/leads":        { title: "Leads",        breadcrumb: ["Leads"],              aiHint: "Score and segment leads with AI"     },
+  "/demo/pipeline":     { title: "Pipeline",     breadcrumb: ["Pipeline"],           aiHint: "Analyze stuck deals"                 },
+  "/demo/contacts":     { title: "Contacts",     breadcrumb: ["Contacts"],           aiHint: "Summarize this contact"              },
+  "/demo/inbox":        { title: "Inbox",        breadcrumb: ["Inbox"],              aiHint: "Summarize and draft replies"         },
+  "/demo/automations":  { title: "Automations",  breadcrumb: ["Automations"],        aiHint: "Recommend an automation"             },
+  "/demo/analytics":    { title: "Analytics",    breadcrumb: ["Analytics"],          aiHint: "Explain what changed this week"      },
+  "/demo/tasks":        { title: "Tasks",        breadcrumb: ["Tasks"],              aiHint: "Generate follow-up tasks"            },
+  "/demo/settings":     { title: "Settings",     breadcrumb: ["Settings"],           aiHint: "Update workspace settings"           },
+  "/demo/messages":     { title: "Messages",     breadcrumb: ["Messages"],           aiHint: "Write a text reply"                  },
+  "/demo/jobs":         { title: "Jobs",         breadcrumb: ["Jobs"],               aiHint: "What jobs are waiting on me?"        },
 };
 
-const AI_HINTS: Record<"agency" | "client", Record<string, string>> = {
-  agency: {
-    "/demo":             "What should I focus on today?",
-    "/demo/agency":      "What should I focus on today?",
-    "/demo/client":      "Who needs a follow-up today?",
-    "/demo/workspaces":  "Create a new workspace",
-    "/demo/leads":       "Score leads with AI",
-    "/demo/pipeline":    "Why are deals stuck?",
-    "/demo/contacts":    "Summarize this contact",
-    "/demo/inbox":       "Draft a reply",
-    "/demo/automations": "Build an automation",
-    "/demo/analytics":   "Explain my trends",
-    "/demo/tasks":       "Prioritize my tasks",
-    "/demo/settings":    "Help with settings",
-  },
-  client: {
-    "/demo":             "Who needs a follow-up today?",
-    "/demo/client":      "Who needs a follow-up today?",
-    "/demo/agency":      "What should I focus on today?",
-    "/demo/leads":       "Show my hottest leads",
-    "/demo/messages":    "Write a text reply",
-    "/demo/jobs":        "What jobs are waiting on me?",
-    "/demo/settings":    "Help with settings",
-  },
-};
+function getPageMeta(pathname: string): PageMeta {
+  if (PAGE_META[pathname]) return PAGE_META[pathname];
+  // partial match for nested routes
+  const match = Object.keys(PAGE_META)
+    .filter((k) => pathname.startsWith(k) && k !== "/demo")
+    .sort((a, b) => b.length - a.length)[0];
+  return match ? PAGE_META[match] : { title: "Pipelly.ai", breadcrumb: [], aiHint: "Ask AI anything" };
+}
 
-export function AppTopbar() {
+export default function AppTopbar() {
   const pathname = usePathname();
-  const { mode } = useDashboardMode();
-  const { setOpen } = useAICopilot();
+  const { openWithQuery, setOpen } = useAICopilot();
+  const meta = getPageMeta(pathname);
 
-  const meta = PAGE_META[pathname] ?? { title: "Pipelly", breadcrumb: [] };
-  const hints = AI_HINTS[mode] ?? AI_HINTS.client;
-  const aiHint = hints[pathname] ?? "Ask AI";
+  const isAgency = pathname.startsWith("/demo/agency");
+  const searchPlaceholder = isAgency
+    ? "Search clients, setups…"
+    : "Search leads, jobs, messages…";
 
   return (
-    <header className="flex h-14 items-center gap-4 border-b border-gray-100 bg-white px-5">
-      {/* Breadcrumb / Title */}
-      <div className="flex items-center gap-1.5 text-sm shrink-0">
-        {meta.breadcrumb.length > 0 ? (
+    <header className="h-14 border-b border-gray-100 bg-white flex items-center px-6 gap-4 shrink-0">
+      {/* Title / breadcrumb */}
+      <div className="flex items-center gap-1.5 min-w-0 mr-4">
+        {meta.breadcrumb.length > 0 && (
           <>
-            <span className="text-gray-400 text-xs">Pipelly</span>
             {meta.breadcrumb.map((crumb, i) => (
-              <span key={i} className="flex items-center gap-1.5">
-                <span className="text-gray-300 text-xs">/</span>
-                <span className={cn("text-xs", i === meta.breadcrumb.length - 1 ? "font-semibold text-gray-900" : "text-gray-400")}>
-                  {crumb}
-                </span>
+              <span key={i} className="text-xs text-gray-400">
+                {crumb} {i < meta.breadcrumb.length - 1 && "/"}&nbsp;
               </span>
             ))}
           </>
-        ) : (
-          <span className="text-sm font-semibold text-gray-900">{meta.title}</span>
         )}
+        <h1 className="text-sm font-semibold text-gray-900 truncate">{meta.title}</h1>
       </div>
 
       {/* Search */}
-      <div className="relative ml-2 flex-1 max-w-xs">
-        <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
-        <input
-          type="text"
-          placeholder={mode === "agency" ? "Search leads, deals, contacts..." : "Search leads, jobs, messages..."}
-          className="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 pl-9 pr-10 text-sm text-gray-900 placeholder:text-gray-400 focus:border-gray-400 focus:bg-white focus:outline-none transition-colors"
-        />
-        <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-gray-200 bg-white px-1.5 py-0.5 text-[10px] text-gray-400">
-          ⌘K
-        </kbd>
+      <div className="flex-1 max-w-sm">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+          <input
+            type="text"
+            placeholder={searchPlaceholder}
+            className="w-full h-8 pl-8 pr-3 text-xs bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-1 focus:ring-gray-300 text-gray-700"
+          />
+        </div>
       </div>
 
-      <div className="ml-auto flex items-center gap-2">
-        {/* Plus */}
-        <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-colors">
-          <Plus className="h-4 w-4" />
-        </button>
-
-        {/* AI action */}
+      <div className="flex items-center gap-2 ml-auto">
+        {/* Ask AI */}
         <button
-          onClick={() => setOpen(true)}
-          className="flex h-8 items-center gap-1.5 rounded-lg bg-gray-900 pl-3 pr-3.5 text-xs font-medium text-white hover:bg-gray-800 transition-colors"
+          onClick={() => { openWithQuery(meta.aiHint); }}
+          className="flex items-center gap-1.5 h-8 px-3 text-xs font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
         >
           <Sparkles className="h-3.5 w-3.5" />
-          <span className="hidden sm:block max-w-[180px] truncate">{aiHint}</span>
-          <span className="block sm:hidden">AI</span>
+          Ask AI
+        </button>
+
+        {/* Copilot panel trigger */}
+        <button
+          onClick={() => setOpen(true)}
+          className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+          title="AI Copilot"
+        >
+          <Sparkles className="h-4 w-4 text-gray-400" />
         </button>
 
         {/* Notifications */}
-        <button className="relative flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-50 transition-colors">
-          <Bell className="h-4 w-4" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
-        </button>
-
-        {/* Help */}
-        <button className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-50 transition-colors">
-          <HelpCircle className="h-4 w-4" />
+        <button className="relative h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+          <Bell className="h-4 w-4 text-gray-400" />
+          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red-500 rounded-full" />
         </button>
 
         {/* Avatar */}
-        <div className="ml-0.5 flex h-7 w-7 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white ring-2 ring-gray-100">
-          JN
+        <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center text-white text-xs font-semibold cursor-pointer">
+          J
         </div>
       </div>
     </header>

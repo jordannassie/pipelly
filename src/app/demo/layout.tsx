@@ -1,5 +1,5 @@
-import { AppSidebar } from "@/components/layout/AppSidebar";
-import { AppTopbar } from "@/components/layout/AppTopbar";
+import AppSidebar from "@/components/layout/AppSidebar";
+import AppTopbar from "@/components/layout/AppTopbar";
 import { AICopilotPanel } from "@/components/ai/AICopilotPanel";
 import { AICopilotProvider } from "@/lib/ai-copilot-context";
 import { DashboardModeProvider } from "@/lib/dashboard-mode-context";

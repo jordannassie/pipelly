@@ -360,3 +360,74 @@ export const mockInvoices: Invoice[] = [
   { id: "inv-003", date: "2026-02-01", amount: 297, status: "paid" },
   { id: "inv-004", date: "2026-01-01", amount: 197, status: "paid" },
 ];
+
+// ── Agency: Business Accounts ────────────────────────────────────────────────
+export type AgencySetupStatus = "launched" | "in-progress" | "waiting" | "needs-attention";
+
+export interface AgencyBusiness {
+  id: string;
+  name: string;
+  industry: string;
+  setupStatus: AgencySetupStatus;
+  adminUser: string;
+  adminEmail: string;
+  health: "excellent" | "good" | "fair" | "poor";
+  lastActivity: string;
+  leads: number;
+  openJobs: number;
+}
+
+export const mockAgencyBusinesses: AgencyBusiness[] = [
+  { id: "ab-1", name: "Apex Roofing",        industry: "Roofing",       setupStatus: "launched",          adminUser: "Mike Torres",    adminEmail: "mike@apexroofing.com",    health: "excellent", lastActivity: "2 hours ago",  leads: 24, openJobs: 8  },
+  { id: "ab-2", name: "BrightPath Plumbing", industry: "Plumbing",      setupStatus: "waiting",           adminUser: "Carol Stevens",  adminEmail: "carol@brightpath.com",    health: "fair",      lastActivity: "1 day ago",    leads: 12, openJobs: 3  },
+  { id: "ab-3", name: "Northstar Med Spa",   industry: "Medical Spa",   setupStatus: "in-progress",       adminUser: "Jessica Kim",    adminEmail: "jessica@northstar.com",   health: "good",      lastActivity: "3 hours ago",  leads: 18, openJobs: 6  },
+  { id: "ab-4", name: "Elevate Solar",       industry: "Solar Energy",  setupStatus: "launched",          adminUser: "Tom Nguyen",     adminEmail: "tom@elevatesolar.com",    health: "good",      lastActivity: "1 hour ago",   leads: 31, openJobs: 12 },
+  { id: "ab-5", name: "Summit HVAC",         industry: "HVAC",          setupStatus: "needs-attention",   adminUser: "Dave Mitchell",  adminEmail: "dave@summithvac.com",     health: "poor",      lastActivity: "5 days ago",   leads: 7,  openJobs: 2  },
+];
+
+export const mockSetupQueue = [
+  { id: "sq-1", business: "BrightPath Plumbing", step: "Waiting for admin invite",      status: "waiting",     color: "bg-amber-50 text-amber-700 border-amber-200" },
+  { id: "sq-2", business: "Apex Roofing",         step: "Launched successfully",         status: "done",        color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  { id: "sq-3", business: "Northstar Med Spa",    step: "Connecting calendar",           status: "in-progress", color: "bg-blue-50 text-blue-700 border-blue-200" },
+  { id: "sq-4", business: "Elevate Solar",        step: "Launched successfully",         status: "done",        color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  { id: "sq-5", business: "Summit HVAC",          step: "Not started — needs attention", status: "alert",       color: "bg-red-50 text-red-700 border-red-200" },
+];
+
+// ── Business: Calendar Events ─────────────────────────────────────────────────
+export type CalendarEventType = "estimate" | "job" | "call" | "follow-up";
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  customer: string;
+  date: string;
+  dayLabel: string;
+  time: string;
+  duration: string;
+  type: CalendarEventType;
+}
+
+const TYPE_COLOR: Record<CalendarEventType, string> = {
+  estimate:   "bg-blue-50 border-blue-200 text-blue-700",
+  job:        "bg-emerald-50 border-emerald-200 text-emerald-700",
+  call:       "bg-violet-50 border-violet-200 text-violet-700",
+  "follow-up":"bg-amber-50 border-amber-200 text-amber-700",
+};
+export { TYPE_COLOR as CALENDAR_TYPE_COLOR };
+
+export const mockCalendarEvents: CalendarEvent[] = [
+  { id: "ce-1", title: "Roof Estimate",        customer: "Dave Mitchell",  date: "2026-04-20", dayLabel: "Mon", time: "9:00 AM",  duration: "1h",  type: "estimate"  },
+  { id: "ce-2", title: "Follow-up Call",        customer: "Jessica Kim",    date: "2026-04-21", dayLabel: "Tue", time: "2:00 PM",  duration: "30m", type: "follow-up" },
+  { id: "ce-3", title: "Roof Installation",     customer: "Tom Nguyen",     date: "2026-04-22", dayLabel: "Wed", time: "7:30 AM",  duration: "6h",  type: "job"       },
+  { id: "ce-4", title: "Storm Damage Estimate", customer: "Angela Brooks",  date: "2026-04-23", dayLabel: "Thu", time: "10:00 AM", duration: "1h",  type: "estimate"  },
+  { id: "ce-5", title: "Gutter Installation",   customer: "Maria Castillo", date: "2026-04-24", dayLabel: "Fri", time: "8:00 AM",  duration: "3h",  type: "job"       },
+  { id: "ce-6", title: "Quote Call",            customer: "Ray Dominguez",  date: "2026-04-22", dayLabel: "Wed", time: "11:00 AM", duration: "30m", type: "call"      },
+];
+
+// ── Business: AI Suggestions ──────────────────────────────────────────────────
+export const mockBusinessAISuggestions = [
+  { id: "bs-1", message: "3 quotes haven't received a reply in 5+ days — follow up now",  action: "Write follow-ups", urgency: "high"   },
+  { id: "bs-2", message: "Tom Nguyen's job is tomorrow — confirm arrival time via text",   action: "Send confirmation", urgency: "high"  },
+  { id: "bs-3", message: "Dave Mitchell called twice — he's ready to book",               action: "Call Dave back",    urgency: "high"  },
+  { id: "bs-4", message: "2 estimates sent over a week ago with no response",             action: "Re-engage leads",   urgency: "medium"},
+];

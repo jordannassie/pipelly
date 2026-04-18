@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 
-export type DashboardMode = "agency" | "client";
+export type DashboardMode = "agency" | "business";
 
 interface DashboardModeContextType {
   mode: DashboardMode;
@@ -16,13 +16,15 @@ const DashboardModeContext = createContext<DashboardModeContextType | null>(null
 const STORAGE_KEY = "pipelly-dashboard-mode";
 
 export function DashboardModeProvider({ children }: { children: ReactNode }) {
-  const [mode, setModeState] = useState<DashboardMode>("client");
+  const [mode, setModeState] = useState<DashboardMode>("business");
   const [hasChosen, setHasChosen] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === "agency" || stored === "client") {
-      setModeState(stored);
+    // migrate "client" → "business"
+    const resolved = stored === "agency" ? "agency" : stored === "business" || stored === "client" ? "business" : null;
+    if (resolved) {
+      setModeState(resolved);
       setHasChosen(true);
     }
   }, []);

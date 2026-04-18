@@ -11,7 +11,7 @@ export default function DemoIndexPage() {
 
   useEffect(() => {
     if (hasChosen) {
-      router.replace(mode === "agency" ? "/demo/agency" : "/demo/client");
+      router.replace(mode === "agency" ? "/demo/agency" : "/demo/business");
     } else {
       router.replace("/login");
     }
@@ -21,7 +21,7 @@ export default function DemoIndexPage() {
     <div className="flex items-center justify-center min-h-full">
       <div className="flex items-center gap-2 text-gray-400">
         <Sparkles className="h-4 w-4 animate-pulse" />
-        <span className="text-sm">Loading your dashboard...</span>
+        <span className="text-sm">Loading your dashboard…</span>
       </div>
     </div>
   );
