@@ -35,7 +35,7 @@ const clientNav = [
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { mode, setMode, hasChosen } = useDashboardMode();
+  const { mode, setMode, userType } = useDashboardMode();
 
   const nav = mode === "agency" ? agencyNav : clientNav;
 
@@ -74,9 +74,10 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         )}
       </div>
 
-      {/* Mode switcher */}
-      {hasChosen && (
+      {/* Mode switcher — agency users only */}
+      {userType === "agency" && (
         <div className="px-4 pt-4 pb-1">
+          <p className="text-[9px] font-semibold uppercase tracking-widest text-gray-400 px-1 mb-1.5">View as</p>
           <div className="flex rounded-xl border border-gray-100 bg-gray-50 p-1">
             <button
               onClick={() => handleModeSwitch("agency")}
@@ -154,7 +155,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white flex-shrink-0">JN</div>
           <div className="flex-1 min-w-0">
             <p className="truncate text-sm font-semibold text-gray-900">Jordan Nassie</p>
-            <p className="truncate text-xs text-gray-400">{mode === "agency" ? "Admin · Agency" : "Owner · Business"}</p>
+            <p className="truncate text-xs text-gray-400">{userType === "agency" ? "Admin · Agency" : "Owner · Business"}</p>
           </div>
         </div>
         <button

@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 export default function AgencyRedirect() {
   const router = useRouter();
   useEffect(() => {
-    localStorage.setItem("pipelly_mode", "agency");
+    localStorage.setItem("pipelly-dashboard-mode", "agency");
+    localStorage.setItem("pipelly-user-type", "agency");
     router.replace("/demo");
   }, [router]);
 

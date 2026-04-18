@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 export default function ClientRedirect() {
   const router = useRouter();
   useEffect(() => {
-    localStorage.setItem("pipelly_mode", "client");
+    localStorage.setItem("pipelly-dashboard-mode", "client");
+    localStorage.setItem("pipelly-user-type", "client");
     router.replace("/demo");
   }, [router]);
 

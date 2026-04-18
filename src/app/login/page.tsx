@@ -6,14 +6,13 @@ import {
   Sparkles, ArrowRight, Check, Briefcase, ChevronLeft, Layers,
 } from "lucide-react";
 
-const STORAGE_KEY = "pipelly-dashboard-mode";
-
 export default function LoginPage() {
   const router = useRouter();
 
-  const handleChoose = (mode: "agency" | "client") => {
-    localStorage.setItem(STORAGE_KEY, mode);
-    router.push(mode === "agency" ? "/demo/agency" : "/demo/client");
+  const handleChoose = (type: "agency" | "client") => {
+    localStorage.setItem("pipelly-dashboard-mode", type);
+    localStorage.setItem("pipelly-user-type", type);
+    router.push(type === "agency" ? "/demo/agency" : "/demo/client");
   };
 
   return (
@@ -130,7 +129,7 @@ export default function LoginPage() {
             <button onClick={() => handleChoose("client")} className="underline hover:text-gray-700 transition-colors font-medium">
               Client Demo
             </button>
-            {" "}— it&apos;s the simpler experience.
+            {" "}— single dashboard, no switching required.
           </p>
 
         </div>
