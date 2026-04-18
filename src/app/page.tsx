@@ -155,14 +155,40 @@ function DashboardMockup() {
 // MARKETING PAGE
 // ─────────────────────────────────────────────────────────────────────────────
 
+const ROTATING_PHRASES = [
+  "acquisition system",
+  "growth engine",
+  "lead machine",
+  "follow-up system",
+  "revenue engine",
+  "client conversion system",
+  "sales automation system",
+  "lead conversion engine",
+  "pipeline operating system",
+  "business growth system",
+];
+
 export default function MarketingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [phraseIdx, setPhraseIdx] = useState(0);
+  const [phraseVisible, setPhraseVisible] = useState(true);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPhraseVisible(false);
+      setTimeout(() => {
+        setPhraseIdx((i) => (i + 1) % ROTATING_PHRASES.length);
+        setPhraseVisible(true);
+      }, 450);
+    }, 2400);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -241,7 +267,24 @@ export default function MarketingPage() {
           {/* Headline */}
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 mb-6 leading-[1.05]">
             The AI-powered<br />
-            <span className="text-gray-400">acquisition system</span><br />
+            {/* Fixed-height container prevents layout shift when phrase changes */}
+            <span style={{ display: "block", height: "1.12em", overflow: "hidden" }}>
+              <span
+                style={{
+                  display: "inline-block",
+                  opacity: phraseVisible ? 1 : 0,
+                  transform: phraseVisible ? "translateY(0px)" : "translateY(-10px)",
+                  transition: "opacity 0.42s ease, transform 0.42s ease",
+                  background: "linear-gradient(135deg, #1e293b 0%, #64748b 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  willChange: "opacity, transform",
+                }}
+              >
+                {ROTATING_PHRASES[phraseIdx]}
+              </span>
+            </span>
             for growing businesses.
           </h1>
 
