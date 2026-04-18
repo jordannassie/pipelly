@@ -612,7 +612,7 @@ export function AICopilotPanel() {
 
   return (
     <>
-      {/* Floating trigger */}
+      {/* Floating trigger — always visible when closed */}
       {!isOpen && (
         <button
           onClick={() => { setOpen(true); if (messages.length === 0) setMessages(initMessages()); }}
@@ -629,12 +629,26 @@ export function AICopilotPanel() {
         </button>
       )}
 
-      {/* Panel */}
+      {/* Full-height right-side panel */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 flex h-[600px] w-[420px] flex-col rounded-2xl border border-gray-200 bg-white shadow-2xl overflow-hidden">
+        <>
+          {/* Backdrop (subtle) */}
+          <div
+            className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px]"
+            onClick={() => setOpen(false)}
+          />
+
+          <div className="fixed top-0 right-0 z-50 flex h-screen w-[400px] flex-col border-l border-gray-200 bg-white shadow-2xl overflow-hidden" style={{ animation: "slideInRight 0.2s ease-out" }}>
 
           {/* Header */}
-          <div className="flex items-center gap-2 border-b border-gray-800 bg-gray-900 px-4 py-3 shrink-0">
+          <div className="flex items-center gap-2 border-b border-gray-800 bg-gray-900 px-4 py-3.5 shrink-0">
+            <button
+              onClick={() => setOpen(false)}
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+              title="Close"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
             <Sparkles className="h-4 w-4 text-white" />
             <span className="text-sm font-semibold text-white">AI Copilot</span>
             <span className="flex items-center gap-1 rounded-full bg-emerald-400/20 border border-emerald-500/30 px-2 py-0.5 text-[9px] font-bold text-emerald-300">
@@ -644,15 +658,9 @@ export function AICopilotPanel() {
               <button
                 onClick={() => { setMessages(initMessages()); }}
                 className="flex h-6 w-6 items-center justify-center rounded-md text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
-                title="Clear"
+                title="Clear chat"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
-              </button>
-              <button
-                onClick={() => setOpen(false)}
-                className="flex h-6 w-6 items-center justify-center rounded-md text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
-              >
-                <X className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
@@ -738,6 +746,7 @@ export function AICopilotPanel() {
             <p className="mt-1.5 text-center text-[10px] text-gray-400">AI responses are illustrative · for demo purposes</p>
           </div>
         </div>
+        </>
       )}
     </>
   );
