@@ -258,12 +258,6 @@ export default function MarketingPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white" />
 
         <div className="relative max-w-5xl mx-auto px-6 text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-600 shadow-sm mb-8">
-            <Sparkles className="h-3.5 w-3.5 text-gray-900" />
-            AI-Powered Business Automation
-          </div>
-
           {/* Headline */}
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 mb-6 leading-[1.05]">
             The AI-powered<br />
