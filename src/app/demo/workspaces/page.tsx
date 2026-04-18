@@ -48,7 +48,7 @@ export default function WorkspacesPage() {
           </div>
           <div>
             <p className="text-sm font-semibold text-gray-900">Create a New Client Workspace with AI</p>
-            <p className="text-xs text-gray-500 mt-0.5">Describe your client in one sentence — Pipelly configures leads, pipeline stages, and automations automatically</p>
+            <p className="text-xs text-gray-500 mt-0.5">Pipelly will create a new client workspace and prepare a recommended acquisition setup.</p>
           </div>
         </div>
         <div className="flex items-center gap-3 mb-3">
@@ -56,7 +56,7 @@ export default function WorkspacesPage() {
             type="text"
             value={aiPrompt}
             onChange={(e) => setAiPrompt(e.target.value)}
-            placeholder="e.g. A roofing company in Dallas targeting homeowners — goal is booked inspections"
+            placeholder="Enter workspace name"
             className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-700 placeholder:text-gray-400 outline-none focus:border-gray-900 focus:bg-white transition-colors"
           />
           <button className="shrink-0 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 transition-colors">
@@ -65,10 +65,11 @@ export default function WorkspacesPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           {[
-            "Roofing company in Texas targeting residential",
-            "B2B SaaS startup focused on SMB sales",
-            "Marketing agency scaling DTC client outreach",
-            "Solar company targeting homeowners in California",
+            "Apex Growth",
+            "Northstar Media",
+            "Elevate Roofing",
+            "BluePeak Digital",
+            "Summit Advisory",
           ].map((s) => (
             <button
               key={s}
