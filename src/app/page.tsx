@@ -275,7 +275,7 @@ export default function MarketingPage() {
                   opacity: phraseVisible ? 1 : 0,
                   transform: phraseVisible ? "translateY(0px)" : "translateY(-10px)",
                   transition: "opacity 0.42s ease, transform 0.42s ease",
-                  background: "linear-gradient(135deg, #1e293b 0%, #64748b 100%)",
+                  background: "linear-gradient(135deg, #16a34a 0%, #4ade80 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
