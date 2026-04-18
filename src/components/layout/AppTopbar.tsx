@@ -5,19 +5,21 @@ import { Search, Plus, Sparkles, Bell, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const pageTitles: Record<string, { title: string; breadcrumb: string[]; aiHint: string }> = {
-  "/demo":              { title: "Home",                breadcrumb: [],                          aiHint: "What should I focus on?" },
-  "/demo/workspaces":   { title: "Workspaces",          breadcrumb: ["Workspaces"],              aiHint: "Create a new workspace" },
-  "/demo/leads":        { title: "Leads",               breadcrumb: ["Leads"],                   aiHint: "Score leads with AI" },
-  "/demo/pipeline":     { title: "Pipeline",            breadcrumb: ["Pipeline"],                aiHint: "Why are deals stuck?" },
-  "/demo/contacts":     { title: "Contacts",            breadcrumb: ["Contacts"],                aiHint: "Summarize this contact" },
-  "/demo/inbox":        { title: "Inbox",               breadcrumb: ["Inbox"],                   aiHint: "Draft a reply" },
-  "/demo/automations":  { title: "Automations",         breadcrumb: ["Automations"],             aiHint: "Build an automation" },
-  "/demo/analytics":    { title: "Analytics",           breadcrumb: ["Analytics"],               aiHint: "Explain my trends" },
-  "/demo/tasks":        { title: "Tasks",               breadcrumb: ["Tasks"],                   aiHint: "Prioritize my tasks" },
-  "/demo/settings":     { title: "Settings",            breadcrumb: ["Settings"],                aiHint: "Help with settings" },
-  "/demo/settings/users":   { title: "Users & Permissions", breadcrumb: ["Settings", "Users"],  aiHint: "Manage team access" },
-  "/demo/settings/billing": { title: "Billing & Plan",      breadcrumb: ["Settings", "Billing"], aiHint: "Explain my plan" },
-  "/demo/onboarding":   { title: "Setup Wizard",        breadcrumb: ["Onboarding"],              aiHint: "Guide me through setup" },
+  "/demo":              { title: "Home",          breadcrumb: [],                         aiHint: "Who needs a follow-up today?" },
+  "/demo/leads":        { title: "Leads",         breadcrumb: ["Leads"],                  aiHint: "Show my hottest leads" },
+  "/demo/messages":     { title: "Messages",      breadcrumb: ["Messages"],               aiHint: "Write a text reply" },
+  "/demo/jobs":         { title: "Jobs",          breadcrumb: ["Jobs"],                   aiHint: "What jobs are waiting on me?" },
+  "/demo/settings":     { title: "Settings",      breadcrumb: ["Settings"],               aiHint: "Help with settings" },
+  "/demo/settings/users":   { title: "Users",     breadcrumb: ["Settings", "Users"],      aiHint: "Manage my team" },
+  "/demo/settings/billing": { title: "Billing",   breadcrumb: ["Settings", "Billing"],    aiHint: "Explain my plan" },
+  "/demo/workspaces":   { title: "Workspaces",    breadcrumb: ["Workspaces"],             aiHint: "Create a new workspace" },
+  "/demo/pipeline":     { title: "Pipeline",      breadcrumb: ["Pipeline"],               aiHint: "Why are deals stuck?" },
+  "/demo/contacts":     { title: "Contacts",      breadcrumb: ["Contacts"],               aiHint: "Summarize this contact" },
+  "/demo/inbox":        { title: "Inbox",         breadcrumb: ["Inbox"],                  aiHint: "Draft a reply" },
+  "/demo/automations":  { title: "Automations",   breadcrumb: ["Automations"],            aiHint: "Build an automation" },
+  "/demo/analytics":    { title: "Analytics",     breadcrumb: ["Analytics"],              aiHint: "Explain my trends" },
+  "/demo/tasks":        { title: "Tasks",         breadcrumb: ["Tasks"],                  aiHint: "Prioritize my tasks" },
+  "/demo/onboarding":   { title: "Setup",         breadcrumb: ["Onboarding"],             aiHint: "Guide me through setup" },
 };
 
 export function AppTopbar() {
@@ -50,7 +52,7 @@ export function AppTopbar() {
         <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
         <input
           type="text"
-          placeholder="Search leads, deals, contacts..."
+          placeholder="Search leads, jobs, messages..."
           className="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 pl-9 pr-12 text-sm text-gray-900 placeholder:text-gray-400 focus:border-gray-400 focus:bg-white focus:outline-none transition-colors"
         />
         <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-gray-200 bg-white px-1.5 py-0.5 text-[10px] text-gray-400">

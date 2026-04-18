@@ -23,16 +23,34 @@ interface AIMessage {
 // ── Context suggestions per page ───────────────────────────────────────────
 const PAGE_SUGGESTIONS: Record<string, { label: string; query: string }[]> = {
   "/demo": [
-    { label: "Analyze pipeline", query: "Analyze my pipeline" },
-    { label: "Draft outreach", query: "Draft outreach for my top leads" },
-    { label: "Generate tasks", query: "Generate follow-up tasks from my pipeline" },
-    { label: "Recommend automations", query: "Recommend automations for my workflow" },
+    { label: "Who needs a follow-up today?",      query: "Who do I need to follow up with today?" },
+    { label: "Write a reply for a lead",           query: "Write a text reply for my top lead" },
+    { label: "Show my hottest leads",              query: "Show my hottest leads" },
+    { label: "What jobs are waiting on me?",       query: "What jobs are waiting on me?" },
   ],
   "/demo/leads": [
-    { label: "Draft outreach for top leads", query: "Draft outreach for top leads" },
-    { label: "Generate follow-up tasks", query: "Generate follow-up tasks" },
-    { label: "Analyze pipeline health", query: "Analyze my pipeline" },
-    { label: "Recommend automations", query: "Recommend automations" },
+    { label: "Show my hottest leads",              query: "Show my hottest leads" },
+    { label: "Write a follow-up text",             query: "Write a text reply for Jessica Kim about her roof estimate" },
+    { label: "Who hasn't been called yet?",        query: "Which leads haven't been contacted yet?" },
+    { label: "Which estimates haven't replied?",   query: "Which estimates have not been answered?" },
+  ],
+  "/demo/messages": [
+    { label: "Write a reply for Dave",             query: "Write a text reply for Dave Mitchell about his roof inquiry" },
+    { label: "Draft a follow-up for Jessica",      query: "Write a text reply for Jessica Kim about her roof estimate" },
+    { label: "Summarize my messages",              query: "Summarize my recent messages" },
+    { label: "Who replied today?",                 query: "Who replied to my messages today?" },
+  ],
+  "/demo/jobs": [
+    { label: "Which estimates haven't replied?",   query: "Which estimates have not been answered?" },
+    { label: "What jobs are booked this week?",    query: "What jobs are waiting on me?" },
+    { label: "Who needs payment collected?",       query: "Generate follow-up tasks for completed jobs" },
+    { label: "Follow up on pending estimates",     query: "Draft outreach for leads with unanswered estimates" },
+  ],
+  "/demo/settings": [
+    { label: "Help with notifications",            query: "How do I set up notifications?" },
+    { label: "Add a team member",                  query: "How do I invite a team member?" },
+    { label: "Explain my plan",                    query: "Explain my current billing plan" },
+    { label: "Help with integrations",             query: "What integrations do you support?" },
   ],
   "/demo/pipeline": [
     { label: "Analyze pipeline", query: "Analyze my pipeline" },
@@ -79,15 +97,18 @@ const PAGE_SUGGESTIONS: Record<string, { label: string; query: string }[]> = {
 };
 
 const PAGE_GREETINGS: Record<string, string> = {
-  "/demo":           "I can see your full system. What would you like me to do?",
-  "/demo/leads":     "I can see your 312 leads. Want me to score them, draft outreach, or find similar ones?",
-  "/demo/pipeline":  "Your pipeline has $74.3k in 8 open deals. 3 haven't had activity in 7+ days — want me to flag those?",
-  "/demo/contacts":  "I can summarize any contact, draft a message, or suggest your next step. Just ask.",
-  "/demo/workspaces":"You have 5 active workspaces. Elevate Roofing is your top performer. Want me to analyze or create a new one?",
-  "/demo/inbox":     "You have 2 unread threads. Marcus Reid replied to your proposal — that one looks high priority.",
+  "/demo":            "Hey Jordan! You have 4 follow-ups due today and 12 new leads. What would you like help with?",
+  "/demo/leads":      "I can see your 10 leads. 3 quotes haven't been answered in 5+ days — want me to write follow-up texts?",
+  "/demo/messages":   "You have 2 unread messages. Dave Mitchell just asked about roof availability. Want me to draft a reply?",
+  "/demo/jobs":       "You have 13 jobs across 6 stages. 3 estimates haven't had a response — should I follow up?",
+  "/demo/settings":   "I can help you with notifications, team access, billing, or integrations. What do you need?",
+  "/demo/pipeline":   "Your pipeline has $74.3k in 8 open deals. 3 haven't had activity in 7+ days — want me to flag those?",
+  "/demo/contacts":   "I can summarize any contact, draft a message, or suggest your next step. Just ask.",
+  "/demo/workspaces": "You have 5 active workspaces. Elevate Roofing is your top performer. Want me to analyze or create a new one?",
+  "/demo/inbox":      "You have 2 unread threads. Marcus Reid replied to your proposal — that one looks high priority.",
   "/demo/automations":"I can build any automation in plain English — or recommend ones based on your pipeline.",
-  "/demo/analytics": "I've analyzed your last 30 days. Lead volume is up 18%, but booked calls dropped slightly.",
-  "/demo/tasks":     "You have 8 tasks — 2 are overdue. Want me to prioritize them and generate a plan for today?",
+  "/demo/analytics":  "I've analyzed your last 30 days. Lead volume is up 18%, but booked calls dropped slightly.",
+  "/demo/tasks":      "You have 8 tasks — 2 are overdue. Want me to prioritize them and generate a plan for today?",
 };
 
 // ── Rich result card components ────────────────────────────────────────────

@@ -2,301 +2,60 @@
 
 import { useState } from "react";
 import {
-  Sparkles, Send, Search, PenLine, BarChart3, Layers, Zap,
-  TrendingUp, TrendingDown, ArrowRight, AlertCircle, Clock,
-  CheckCircle2, ChevronRight, Building2, Contact, CheckSquare, Copy, Check, Plus, X,
+  Sparkles, Send, TrendingUp, TrendingDown,
+  Phone, FileText, CheckCircle2, Clock, X, AlertCircle,
+  Users2, Briefcase, MessageSquare, ChevronRight,
 } from "lucide-react";
-import { QuickActionCard } from "@/components/ui/QuickActionCard";
-import { Badge } from "@/components/ui/Badge";
-import { mockWorkspaces, mockKPIs, mockAISuggestions, mockAIActivity } from "@/lib/mock-data";
-import { cn, formatCurrency, getInitials, healthColor } from "@/lib/utils";
+import { mockLiteKPIs, mockLiteTasks, mockLiteLeads } from "@/lib/mock-data";
+import { cn } from "@/lib/utils";
 import { useAICopilot, detectCardType, type AICardType } from "@/lib/ai-copilot-context";
+import Link from "next/link";
 
-// ── Prompt chips ───────────────────────────────────────────────────────────
-const PROMPT_CHIPS = [
-  { label: "Analyze my pipeline",              icon: BarChart3,  action: "pipeline"    as AICardType },
-  { label: "Draft outreach for top leads",     icon: PenLine,    action: "outreach"    as AICardType },
-  { label: "Create a client workspace",        icon: Building2,  action: "workspace"   as AICardType },
-  { label: "Generate follow-up tasks",         icon: CheckSquare,action: "tasks"       as AICardType },
-  { label: "Recommend automations",            icon: Zap,        action: "automations" as AICardType },
-  { label: "Summarize Marcus Reid",            icon: Contact,    action: "contact"     as AICardType },
-];
-
-const QUICK_ACTIONS = [
-  { icon: Search,   label: "Find",     description: "Discover qualified leads", accent: "bg-blue-500" },
-  { icon: PenLine,  label: "Write",    description: "Generate AI outreach copy", accent: "bg-violet-500" },
-  { icon: BarChart3,label: "Analyze",  description: "Understand pipeline health", accent: "bg-emerald-500" },
-  { icon: Layers,   label: "Build",    description: "Create client workspaces", accent: "bg-amber-500" },
-  { icon: Zap,      label: "Automate", description: "Set up smart workflows", accent: "bg-rose-500" },
-];
-
-const ACTIVITY_STYLES: Record<string, { color: string; bg: string }> = {
-  outreach:   { color: "text-blue-600",   bg: "bg-blue-50" },
-  import:     { color: "text-violet-600", bg: "bg-violet-50" },
-  task:       { color: "text-amber-600",  bg: "bg-amber-50" },
-  automation: { color: "text-emerald-600",bg: "bg-emerald-50" },
-  analysis:   { color: "text-rose-600",   bg: "bg-rose-50" },
+const STATUS_LABELS: Record<string, { label: string; color: string }> = {
+  "new":        { label: "New",         color: "bg-blue-50 text-blue-700" },
+  "contacted":  { label: "Contacted",   color: "bg-amber-50 text-amber-700" },
+  "quote-sent": { label: "Quote Sent",  color: "bg-violet-50 text-violet-700" },
+  "booked":     { label: "Booked",      color: "bg-emerald-50 text-emerald-700" },
+  "closed":     { label: "Closed",      color: "bg-gray-100 text-gray-500" },
 };
 
-// ── Inline AI result cards (compact versions for home hero) ────────────────
-function InlinePipelineResult({ onDismiss }: { onDismiss: () => void }) {
-  const deals = [
-    { name: "Elevate Roofing", value: "$24k", risk: "high", days: 6 },
-    { name: "BrightPath", value: "$6k", risk: "medium", days: 4 },
-    { name: "Solaris Solar", value: "$11k", risk: "medium", days: 3 },
-  ];
-  return (
-    <ResultShell title="Pipeline Analysis" icon={BarChart3} onDismiss={onDismiss}>
-      <div className="grid grid-cols-4 gap-3 mb-4">
-        {[["$74.3k", "Total Value"], ["8", "Open Deals"], ["3", "At Risk"], ["62%", "Health"]].map(([v, l]) => (
-          <div key={l} className="rounded-xl bg-gray-50 border border-gray-100 p-3 text-center">
-            <p className="text-lg font-bold text-gray-900">{v}</p>
-            <p className="text-[10px] text-gray-400">{l}</p>
-          </div>
-        ))}
-      </div>
-      <div className="mb-3 space-y-1.5">
-        {deals.map((d) => (
-          <div key={d.name} className="flex items-center gap-3 rounded-lg border border-gray-100 bg-white px-4 py-2.5">
-            <span className={cn("h-2 w-2 rounded-full shrink-0", d.risk === "high" ? "bg-red-400" : "bg-amber-400")} />
-            <span className="flex-1 text-sm font-medium text-gray-900">{d.name}</span>
-            <span className="text-sm font-semibold text-gray-700">{d.value}</span>
-            <span className="text-xs text-gray-400">{d.days}d idle</span>
-            <AlertCircle className={cn("h-4 w-4", d.risk === "high" ? "text-red-400" : "text-amber-400")} />
-          </div>
-        ))}
-      </div>
-      <div className="flex items-center gap-2">
-        <button className="flex-1 rounded-xl bg-gray-900 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 transition-colors text-center">
-          Draft Follow-up Emails
-        </button>
-        <button className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">
-          View Pipeline
-        </button>
-      </div>
-    </ResultShell>
-  );
-}
+const URGENCY_COLOR: Record<string, string> = {
+  high:   "bg-red-50 border-red-100",
+  medium: "bg-amber-50 border-amber-100",
+  low:    "bg-gray-50 border-gray-100",
+};
 
-function InlineOutreachResult({ onDismiss }: { onDismiss: () => void }) {
-  const [copied, setCopied] = useState(false);
-  const email = `Subject: Quick question about {Company}'s growth strategy
+const URGENCY_DOT: Record<string, string> = {
+  high: "bg-red-400", medium: "bg-amber-400", low: "bg-gray-300",
+};
 
-Hey {First Name},
+const PROMPT_CHIPS = [
+  { label: "Who needs a follow-up?",        action: "tasks"    as AICardType },
+  { label: "Write a reply for a lead",      action: "outreach" as AICardType },
+  { label: "Show my hottest leads",         action: "contact"  as AICardType },
+  { label: "What jobs are waiting on me?",  action: "pipeline" as AICardType },
+];
 
-I came across {Company} and noticed you're scaling your acquisition — congrats on the growth.
-
-I run Pipelly.ai, an AI system that helps agencies and service businesses find leads, run outreach, and fill their pipeline automatically.
-
-Would it make sense to connect for 15 minutes to see if there's a fit?
-
-Best,
-Jordan`;
-  return (
-    <ResultShell title="AI Outreach Draft" icon={PenLine} onDismiss={onDismiss}>
-      <div className="grid grid-cols-3 gap-2 mb-3">
-        {[["Audience", "Top 5 leads"], ["Tone", "Direct"], ["Type", "Cold intro"]].map(([k, v]) => (
-          <div key={k} className="rounded-lg bg-gray-50 border border-gray-100 px-3 py-2">
-            <p className="text-[10px] text-gray-400">{k}</p>
-            <p className="text-xs font-semibold text-gray-800">{v}</p>
-          </div>
-        ))}
-      </div>
-      <div className="rounded-xl bg-gray-50 border border-gray-200 p-4 mb-3">
-        <pre className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap font-sans">{email}</pre>
-      </div>
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-          className={cn("flex flex-1 items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-semibold transition-colors", copied ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-gray-200 bg-white text-gray-700 hover:border-gray-900")}
-        >
-          {copied ? <><Check className="h-4 w-4" />Copied!</> : <><Copy className="h-4 w-4" />Copy Email</>}
-        </button>
-        <button className="rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 transition-colors">
-          Send to Top 5
-        </button>
-      </div>
-    </ResultShell>
-  );
-}
-
-function InlineWorkspaceResult({ onDismiss }: { onDismiss: () => void }) {
-  const stages = ["Qualified", "Contact Made", "Demo Scheduled", "Proposal Made", "Closed Won"];
-  return (
-    <ResultShell title="Workspace Created" icon={Building2} onDismiss={onDismiss}>
-      <div className="flex items-center gap-3 mb-4 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        <div className="h-10 w-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white text-sm font-bold shrink-0">AR</div>
-        <div>
-          <p className="text-sm font-bold text-gray-900">Apex Roofing Dallas</p>
-          <p className="text-xs text-gray-500">Home Services · Dallas, TX · Residential</p>
-        </div>
-        <Badge variant="success" className="ml-auto">Ready</Badge>
-      </div>
-      <div className="grid grid-cols-3 gap-2 mb-4">
-        {[["50", "Initial Leads"], ["5", "Pipeline Stages"], ["3", "Auto-rules"]].map(([v, l]) => (
-          <div key={l} className="rounded-xl bg-gray-50 border border-gray-100 p-3 text-center">
-            <p className="text-lg font-bold text-gray-900">{v}</p>
-            <p className="text-[10px] text-gray-400">{l}</p>
-          </div>
-        ))}
-      </div>
-      <div className="mb-4">
-        <p className="text-xs font-semibold text-gray-500 mb-2">Pipeline</p>
-        <div className="flex items-center gap-1 flex-wrap">
-          {stages.map((s, i) => (
-            <span key={s} className="flex items-center gap-1">
-              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-700">{s}</span>
-              {i < stages.length - 1 && <ArrowRight className="h-3 w-3 text-gray-300" />}
-            </span>
-          ))}
-        </div>
-      </div>
-      <div className="mb-4 space-y-1">
-        {["Calendly → Demo Scheduled", "5-day follow-up sequence", "Deal won → Onboarding tasks"].map((a) => (
-          <div key={a} className="flex items-center gap-2">
-            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-            <span className="text-xs text-gray-700">{a}</span>
-          </div>
-        ))}
-      </div>
-      <div className="flex items-center gap-2">
-        <button className="flex-1 rounded-xl bg-gray-900 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 transition-colors text-center">Open Workspace</button>
-        <button className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">Customize</button>
-      </div>
-    </ResultShell>
-  );
-}
-
-function InlineTasksResult({ onDismiss }: { onDismiss: () => void }) {
-  const [checked, setChecked] = useState<Record<number, boolean>>({});
-  const tasks = [
-    { label: "Follow up with Marcus Reid — proposal pending 3 days", priority: "high", due: "Today" },
-    { label: "Confirm Sophia Chen's demo for April 22nd", priority: "high", due: "Today" },
-    { label: "Re-engage 12 cold leads with new sequence", priority: "medium", due: "Tomorrow" },
-    { label: "Review Northstar Media proposal", priority: "medium", due: "Apr 20" },
-    { label: "Approve BrightPath automation", priority: "low", due: "Apr 21" },
-  ];
-  return (
-    <ResultShell title="AI Generated Tasks" icon={CheckSquare} onDismiss={onDismiss}>
-      <div className="mb-3 space-y-1.5">
-        {tasks.map((t, i) => (
-          <div key={i} onClick={() => setChecked((p) => ({ ...p, [i]: !p[i] }))}
-            className={cn("flex items-center gap-3 rounded-lg border px-4 py-2.5 cursor-pointer transition-colors", checked[i] ? "border-gray-100 bg-gray-50 opacity-60" : "border-gray-200 bg-white hover:border-gray-300")}>
-            <div className={cn("h-4 w-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors", checked[i] ? "border-emerald-500 bg-emerald-500" : "border-gray-300")}>
-              {checked[i] && <Check className="h-2.5 w-2.5 text-white" />}
-            </div>
-            <span className={cn("flex-1 text-sm", checked[i] ? "line-through text-gray-400" : "text-gray-800")}>{t.label}</span>
-            <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-bold", t.priority === "high" ? "bg-red-100 text-red-700" : t.priority === "medium" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-600")}>
-              {t.priority}
-            </span>
-          </div>
-        ))}
-      </div>
-      <button className="w-full rounded-xl bg-gray-900 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 transition-colors">
-        Add All to Tasks
-      </button>
-    </ResultShell>
-  );
-}
-
-function InlineAutomationsResult({ onDismiss }: { onDismiss: () => void }) {
-  const [enabled, setEnabled] = useState<Record<number, boolean>>({});
-  const recs = [
-    { name: "Calendly → Demo Scheduled", trigger: "Meeting booked", action: "Move deal + notify", impact: "High" },
-    { name: "5-Day No Reply Follow-up", trigger: "No reply after 5 days", action: "Send email sequence", impact: "High" },
-    { name: "Deal Won → Create Workspace", trigger: "Closed Won", action: "Auto-create workspace", impact: "Medium" },
-  ];
-  return (
-    <ResultShell title="Recommended Automations" icon={Zap} onDismiss={onDismiss}>
-      <div className="mb-3 space-y-2">
-        {recs.map((r, i) => (
-          <div key={i} className={cn("rounded-xl border p-4 transition-colors", enabled[i] ? "border-emerald-200 bg-emerald-50" : "border-gray-200 bg-white")}>
-            <div className="flex items-start justify-between gap-2 mb-2">
-              <p className="text-sm font-semibold text-gray-900">{r.name}</p>
-              <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-bold", r.impact === "High" ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600")}>{r.impact}</span>
-            </div>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="rounded-md bg-blue-50 border border-blue-100 px-2 py-0.5 text-xs text-blue-700">{r.trigger}</span>
-              <ArrowRight className="h-3 w-3 text-gray-400" />
-              <span className="rounded-md bg-emerald-50 border border-emerald-100 px-2 py-0.5 text-xs text-emerald-700">{r.action}</span>
-            </div>
-            <button onClick={() => setEnabled((p) => ({ ...p, [i]: !p[i] }))}
-              className={cn("flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors", enabled[i] ? "bg-emerald-600 text-white" : "bg-gray-900 text-white hover:bg-gray-700")}>
-              {enabled[i] ? <><Check className="h-3 w-3" />Enabled</> : <><Plus className="h-3 w-3" />Enable</>}
-            </button>
-          </div>
-        ))}
-      </div>
-      <button className="w-full rounded-xl border border-gray-200 py-2.5 text-sm font-semibold text-gray-700 hover:border-gray-900 hover:text-gray-900 transition-colors">
-        Enable All 3 Automations
-      </button>
-    </ResultShell>
-  );
-}
-
-function InlineContactResult({ onDismiss }: { onDismiss: () => void }) {
-  const signals = [
-    { ok: true,  text: "Replied to 3 of 4 emails — strong engagement" },
-    { ok: true,  text: "Asked budget questions — buying signal" },
-    { ok: true,  text: "Opened proposal email 4 times" },
-    { ok: false, text: "No reply to last follow-up (3 days ago)" },
-  ];
-  return (
-    <ResultShell title="Contact Summary" icon={Contact} onDismiss={onDismiss}>
-      <div className="flex items-center gap-3 mb-4 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        <div className="h-11 w-11 rounded-full bg-gray-900 flex items-center justify-center text-sm font-bold text-white shrink-0">MR</div>
-        <div>
-          <p className="text-sm font-bold text-gray-900">Marcus Reid</p>
-          <p className="text-xs text-gray-500">CEO · Apex Growth · Marketing Agency</p>
-        </div>
-        <div className="ml-auto text-right">
-          <p className="text-xs font-bold text-gray-900">$12,000</p>
-          <p className="text-[10px] text-gray-400">Open deals</p>
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-2 mb-3">
-        {[["Score", "92 / 100"], ["Stage", "Proposal Made"], ["Last reply", "2 days ago"], ["Emails", "4 sent"]].map(([k, v]) => (
-          <div key={k} className="rounded-lg bg-gray-50 border border-gray-100 px-3 py-2">
-            <p className="text-[10px] text-gray-400">{k}</p>
-            <p className="text-xs font-semibold text-gray-800">{v}</p>
-          </div>
-        ))}
-      </div>
-      <div className="mb-3 space-y-1.5">
-        {signals.map((s) => (
-          <div key={s.text} className="flex items-start gap-2">
-            {s.ok ? <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" /> : <AlertCircle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />}
-            <span className="text-sm text-gray-600">{s.text}</span>
-          </div>
-        ))}
-      </div>
-      <div className="rounded-xl bg-gray-50 border border-gray-200 px-4 py-3 mb-3">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-0.5">AI Recommendation</p>
-        <p className="text-sm text-gray-700">Send a short follow-up today referencing his Thursday team meeting. Keep it under 3 sentences.</p>
-      </div>
-      <div className="flex items-center gap-2">
-        <button className="flex-1 rounded-xl bg-gray-900 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 transition-colors text-center">Draft Message</button>
-        <button className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:border-gray-900 transition-colors">View Contact</button>
-      </div>
-    </ResultShell>
-  );
-}
-
-function ResultShell({ title, icon: Icon, onDismiss, children }: {
+// ── Inline result shell ────────────────────────────────────────────────────
+function ResultShell({
+  title, icon: Icon, onDismiss, children,
+}: {
   title: string; icon: React.ElementType; onDismiss: () => void; children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-4">
-      <div className="flex items-center gap-2 bg-gray-900 px-5 py-3.5">
-        <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-white/10">
-          <Icon className="h-3.5 w-3.5 text-white" />
+    <div className="mt-4 rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+      <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gray-900">
+            <Icon className="h-4 w-4 text-white" />
+          </div>
+          <span className="text-sm font-semibold text-gray-900">{title}</span>
+          <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600 flex items-center gap-1">
+            <Sparkles className="h-3 w-3" /> AI Result
+          </span>
         </div>
-        <span className="text-sm font-semibold text-white flex-1">{title}</span>
-        <span className="flex items-center gap-1 rounded-full bg-emerald-400/20 border border-emerald-500/30 px-2 py-0.5 text-[9px] font-bold text-emerald-300 mr-1">
-          <Sparkles className="h-2.5 w-2.5" />AI RESULT
-        </span>
-        <button onClick={onDismiss} className="flex h-6 w-6 items-center justify-center rounded-md text-gray-400 hover:bg-white/10 hover:text-white transition-colors">
-          <X className="h-3.5 w-3.5" />
+        <button onClick={onDismiss} className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
+          <X className="h-4 w-4" />
         </button>
       </div>
       <div className="p-5">{children}</div>
@@ -304,285 +63,334 @@ function ResultShell({ title, icon: Icon, onDismiss, children }: {
   );
 }
 
-function HealthBar({ health }: { health: string }) {
-  const pct = { excellent: 95, good: 72, fair: 48, poor: 24 }[health] ?? 50;
-  const color = { excellent: "bg-emerald-500", good: "bg-blue-500", fair: "bg-amber-400", poor: "bg-red-400" }[health] ?? "bg-gray-400";
+function InlineFollowUpResult({ onDismiss }: { onDismiss: () => void }) {
+  const followups = [
+    { name: "Jessica Kim",   service: "Roof Replacement",    reason: "Quote sent 3 days ago — no reply",  action: "Follow up on quote", urgency: "high" },
+    { name: "Ray Dominguez", service: "Gutter Replacement",  reason: "Quote sent 5 days ago — no reply",  action: "Follow up on quote", urgency: "high" },
+    { name: "Sarah Johnson", service: "Storm Damage Repair", reason: "Spoke 2 days ago — estimate pending", action: "Schedule estimate", urgency: "medium" },
+    { name: "Carol Stevens", service: "Skylight Install",    reason: "Quote sent 5 days ago — no reply",  action: "Send reminder",      urgency: "medium" },
+  ];
   return (
-    <div className="flex items-center gap-2">
-      <div className="h-1 w-16 rounded-full bg-gray-100 overflow-hidden">
-        <div className={cn("h-full rounded-full", color)} style={{ width: `${pct}%` }} />
+    <ResultShell title="Follow-Ups Needed Today" icon={Clock} onDismiss={onDismiss}>
+      <p className="text-sm text-gray-500 mb-4">AI found 4 leads that need attention today.</p>
+      <div className="space-y-2.5">
+        {followups.map((f) => (
+          <div key={f.name} className={cn("flex items-center gap-4 rounded-xl border px-4 py-3", URGENCY_COLOR[f.urgency])}>
+            <span className={cn("h-2.5 w-2.5 rounded-full shrink-0", URGENCY_DOT[f.urgency])} />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900">{f.name}</p>
+              <p className="text-xs text-gray-500 truncate">{f.reason}</p>
+            </div>
+            <button className="shrink-0 rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800 transition-colors">
+              {f.action}
+            </button>
+          </div>
+        ))}
       </div>
-      <span className="text-[10px] text-gray-400">{pct}%</span>
-    </div>
+    </ResultShell>
   );
 }
 
-// ── Main page ──────────────────────────────────────────────────────────────
-export default function DashboardPage() {
-  const [prompt, setPrompt] = useState("");
-  const [activeResult, setActiveResult] = useState<AICardType | null>(null);
+function InlineOutreachResult({ onDismiss }: { onDismiss: () => void }) {
+  const [copied, setCopied] = useState(false);
+  const draft = `Hi Jessica! Just following up on the roofing estimate I sent over a few days ago. Happy to answer any questions or walk you through what's included. Are you free for a quick call this week?`;
+  return (
+    <ResultShell title="AI Text Draft — Jessica Kim" icon={MessageSquare} onDismiss={onDismiss}>
+      <p className="text-xs text-gray-400 mb-3">Quote follow-up · Roof Replacement · $11,000</p>
+      <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 text-sm text-gray-800 leading-relaxed mb-4">
+        {draft}
+      </div>
+      <div className="flex gap-2">
+        <button
+          onClick={() => { navigator.clipboard.writeText(draft); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+          className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gray-900 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
+        >
+          {copied ? <CheckCircle2 className="h-4 w-4" /> : <Phone className="h-4 w-4" />}
+          {copied ? "Copied!" : "Copy & Send"}
+        </button>
+        <button className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:border-gray-300 transition-colors">
+          Edit
+        </button>
+      </div>
+    </ResultShell>
+  );
+}
+
+function InlineHotLeadsResult({ onDismiss }: { onDismiss: () => void }) {
+  const hot = [
+    { name: "Tom Nguyen",     service: "Full Roof Replace",    status: "booked",     score: "Hot" },
+    { name: "Jessica Kim",    service: "Roof Replacement",     status: "quote-sent", score: "Hot" },
+    { name: "Mike Torres",    service: "Leak Repair",          status: "contacted",  score: "Warm" },
+    { name: "Sarah Johnson",  service: "Storm Damage Repair",  status: "contacted",  score: "Warm" },
+  ];
+  return (
+    <ResultShell title="Your Hottest Leads" icon={Users2} onDismiss={onDismiss}>
+      <p className="text-sm text-gray-500 mb-4">AI ranked leads by urgency and engagement.</p>
+      <div className="space-y-2">
+        {hot.map((l) => (
+          <div key={l.name} className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-700 shrink-0">
+              {l.name.split(" ").map((n) => n[0]).join("")}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900">{l.name}</p>
+              <p className="text-xs text-gray-500">{l.service}</p>
+            </div>
+            <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold",
+              l.score === "Hot" ? "bg-red-50 text-red-600" : "bg-amber-50 text-amber-600"
+            )}>
+              {l.score}
+            </span>
+          </div>
+        ))}
+      </div>
+    </ResultShell>
+  );
+}
+
+function InlineJobsResult({ onDismiss }: { onDismiss: () => void }) {
+  const waiting = [
+    { customer: "Angela Brooks", service: "Flat Roof Repair",   action: "Confirm materials",    stage: "Booked" },
+    { customer: "Frank Osei",    service: "Storm Damage Repair", action: "Collect payment",      stage: "Job Done" },
+    { customer: "Maria Castillo",service: "Gutter Cleaning",    action: "Send invoice",         stage: "Job Done" },
+  ];
+  return (
+    <ResultShell title="Jobs Waiting on You" icon={Briefcase} onDismiss={onDismiss}>
+      <p className="text-sm text-gray-500 mb-4">These 3 jobs have open actions that need your attention.</p>
+      <div className="space-y-2.5">
+        {waiting.map((j) => (
+          <div key={j.customer} className="flex items-center gap-4 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+            <FileText className="h-5 w-5 text-gray-400 shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900">{j.customer}</p>
+              <p className="text-xs text-gray-500">{j.service} · {j.stage}</p>
+            </div>
+            <span className="text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-lg px-3 py-1.5">
+              {j.action}
+            </span>
+          </div>
+        ))}
+      </div>
+    </ResultShell>
+  );
+}
+
+// ── Home Page ──────────────────────────────────────────────────────────────
+export default function HomePage() {
+  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [activeResult, setActiveResult] = useState<AICardType | null>(null);
+  const [tasks, setTasks] = useState(mockLiteTasks);
   const { openWithQuery } = useAICopilot();
 
-  const handleSend = (query?: string) => {
-    const q = (query ?? prompt).trim();
-    if (!q) return;
-    const type = detectCardType(q);
-    if (type) {
-      setLoading(true);
-      setActiveResult(null);
-      setTimeout(() => { setLoading(false); setActiveResult(type); }, 900);
-    } else {
-      openWithQuery(q);
+  const handleSend = (query: string = input) => {
+    if (!query.trim()) return;
+    const cardType = detectCardType(query);
+    if (cardType === "tasks")     { setActiveResult("tasks");     setLoading(true); setTimeout(() => setLoading(false), 900); }
+    else if (cardType === "outreach")  { setActiveResult("outreach");  setLoading(true); setTimeout(() => setLoading(false), 900); }
+    else if (cardType === "contact")   { setActiveResult("contact");   setLoading(true); setTimeout(() => setLoading(false), 900); }
+    else if (cardType === "pipeline")  { setActiveResult("pipeline");  setLoading(true); setTimeout(() => setLoading(false), 900); }
+    else {
+      openWithQuery(query);
     }
-    setPrompt("");
+    setInput("");
   };
 
-  const handleChip = (chip: typeof PROMPT_CHIPS[0]) => {
-    setLoading(true);
-    setActiveResult(null);
-    setTimeout(() => { setLoading(false); setActiveResult(chip.action); }, 900);
-  };
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
   return (
-    <div className="p-6 max-w-[1400px]">
+    <div className="min-h-full bg-gray-50/50">
+      <div className="max-w-3xl mx-auto px-6 py-12">
 
-      {/* AI Hero */}
-      <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <div className="flex items-start justify-between mb-5">
-          <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="flex h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-emerald-100" />
-              <span className="text-xs font-medium text-emerald-600">AI System Active</span>
+        {/* ── Greeting ── */}
+        <div className="mb-10">
+          <h1 className="text-3xl font-bold text-gray-900 mb-1">{greeting}, Jordan.</h1>
+          <p className="text-base text-gray-500">Here&apos;s what&apos;s happening with your business today.</p>
+        </div>
+
+        {/* ── AI Input ── */}
+        <div className="mb-10">
+          <div className="relative rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden focus-within:border-gray-400 focus-within:shadow-md transition-all">
+            <div className="flex items-center gap-3 px-5 py-4">
+              <Sparkles className="h-5 w-5 text-gray-400 flex-shrink-0" />
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                placeholder="What do you need help with today?"
+                className="flex-1 bg-transparent text-base text-gray-900 placeholder:text-gray-400 focus:outline-none"
+              />
+              <button
+                onClick={() => handleSend()}
+                disabled={!input.trim()}
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-30 transition-all"
+              >
+                <Send className="h-4 w-4" />
+              </button>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">Good morning, Jordan.</h1>
-            <p className="text-sm text-gray-500 mt-0.5">
-              Your pipeline has <strong className="text-gray-900">$74.3k</strong> in open deals · <strong className="text-gray-900">3 tasks</strong> need attention today
-            </p>
+            {/* Prompt chips */}
+            <div className="flex flex-wrap gap-2 px-5 pb-4 border-t border-gray-50 pt-3">
+              {PROMPT_CHIPS.map((chip) => (
+                <button
+                  key={chip.label}
+                  onClick={() => handleSend(chip.label)}
+                  className="rounded-full border border-gray-200 bg-gray-50 px-3.5 py-1.5 text-xs font-medium text-gray-600 hover:border-gray-300 hover:bg-white hover:text-gray-900 transition-colors"
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-right">
-            <p className="text-[10px] text-gray-400 uppercase tracking-wide">Today</p>
-            <p className="text-xs font-semibold text-gray-700">Fri, Apr 18</p>
+
+          {/* AI Result area */}
+          {loading && (
+            <div className="mt-4 flex items-center gap-3 rounded-2xl border border-gray-100 bg-white px-5 py-4 shadow-sm">
+              <Sparkles className="h-4 w-4 text-gray-400 animate-pulse" />
+              <span className="text-sm text-gray-500">AI is thinking...</span>
+              <div className="flex gap-1 ml-1">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="h-1.5 w-1.5 rounded-full bg-gray-300 animate-bounce" style={{ animationDelay: `${i * 150}ms` }} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!loading && activeResult === "tasks" && <InlineFollowUpResult onDismiss={() => setActiveResult(null)} />}
+          {!loading && activeResult === "outreach" && <InlineOutreachResult onDismiss={() => setActiveResult(null)} />}
+          {!loading && activeResult === "contact" && <InlineHotLeadsResult onDismiss={() => setActiveResult(null)} />}
+          {!loading && activeResult === "pipeline" && <InlineJobsResult onDismiss={() => setActiveResult(null)} />}
+        </div>
+
+        {/* ── KPIs ── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
+          {mockLiteKPIs.map((kpi) => (
+            <div key={kpi.label} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+              <p className="text-xs font-medium text-gray-400 mb-2">{kpi.label}</p>
+              <p className="text-2xl font-bold text-gray-900 mb-1.5">{kpi.value}</p>
+              <div className="flex items-center gap-1">
+                {kpi.trend === "up"
+                  ? <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
+                  : <TrendingDown className="h-3.5 w-3.5 text-red-400" />}
+                <span className={cn("text-xs font-medium", kpi.trend === "up" ? "text-emerald-600" : "text-red-500")}>
+                  {kpi.trend === "up" ? "+" : ""}{kpi.change}{typeof kpi.change === "number" ? "%" : ""}
+                </span>
+                <span className="text-xs text-gray-400">this month</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Today's Tasks + Recent Leads ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          {/* Today's Tasks */}
+          <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+              <div className="flex items-center gap-2.5">
+                <CheckCircle2 className="h-4 w-4 text-gray-400" />
+                <h2 className="text-sm font-semibold text-gray-900">Today&apos;s Tasks</h2>
+                <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-600">
+                  {tasks.filter((t) => !t.done).length}
+                </span>
+              </div>
+              <button
+                onClick={() => openWithQuery("Generate follow-up tasks from my leads")}
+                className="text-xs font-medium text-gray-400 hover:text-gray-700 transition-colors flex items-center gap-1"
+              >
+                <Sparkles className="h-3 w-3" /> Refresh
+              </button>
+            </div>
+            <div className="divide-y divide-gray-50">
+              {tasks.map((task) => (
+                <div
+                  key={task.id}
+                  className={cn("flex items-start gap-3 px-5 py-3.5 transition-colors", task.done ? "opacity-40" : "")}
+                >
+                  <button
+                    onClick={() => setTasks((prev) => prev.map((t) => t.id === task.id ? { ...t, done: !t.done } : t))}
+                    className={cn(
+                      "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+                      task.done ? "border-emerald-500 bg-emerald-500" : "border-gray-300 hover:border-gray-500"
+                    )}
+                  >
+                    {task.done && <CheckCircle2 className="h-3 w-3 text-white" />}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <p className={cn("text-sm text-gray-800 leading-snug", task.done && "line-through text-gray-400")}>
+                      {task.text}
+                    </p>
+                  </div>
+                  <span className={cn("shrink-0 h-2 w-2 rounded-full mt-1.5",
+                    task.urgency === "high" ? "bg-red-400" : task.urgency === "medium" ? "bg-amber-400" : "bg-gray-300"
+                  )} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Recent Leads */}
+          <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+              <div className="flex items-center gap-2.5">
+                <Users2 className="h-4 w-4 text-gray-400" />
+                <h2 className="text-sm font-semibold text-gray-900">Recent Leads</h2>
+              </div>
+              <Link href="/demo/leads" className="text-xs font-medium text-gray-400 hover:text-gray-700 transition-colors flex items-center gap-1">
+                View all <ChevronRight className="h-3 w-3" />
+              </Link>
+            </div>
+            <div className="divide-y divide-gray-50">
+              {mockLiteLeads.slice(0, 5).map((lead) => {
+                const st = STATUS_LABELS[lead.status];
+                return (
+                  <div key={lead.id} className="flex items-center gap-3 px-5 py-3.5">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-xs font-bold text-gray-600 shrink-0">
+                      {lead.name.split(" ").map((n) => n[0]).join("")}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 truncate">{lead.name}</p>
+                      <p className="text-xs text-gray-500 truncate">{lead.service}</p>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", st.color)}>
+                        {st.label}
+                      </span>
+                      <span className="text-[10px] text-gray-400">{lead.lastContact}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="px-5 py-3 border-t border-gray-50">
+              <button
+                onClick={() => openWithQuery("Show my hottest leads")}
+                className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                Ask AI: Show my hottest leads
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Input */}
-        <div className={cn("rounded-xl border-2 bg-white p-3.5 flex items-center gap-3 transition-all mb-3", prompt ? "border-gray-900 shadow-sm" : "border-gray-200")}>
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-900 shrink-0">
-            <Sparkles className="h-4 w-4 text-white" />
+        {/* ── Needs Attention banner ── */}
+        <div className="mt-6 rounded-2xl border border-amber-100 bg-amber-50 px-5 py-4 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-amber-900">3 estimates haven&apos;t been answered in 5+ days</p>
+            <p className="text-xs text-amber-700 mt-0.5">Jessica Kim, Ray Dominguez, and Carol Stevens are waiting. AI can write follow-ups.</p>
           </div>
-          <input
-            type="text"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            placeholder="What do you want Pipelly to do today?"
-            className="flex-1 text-sm text-gray-800 placeholder:text-gray-400 outline-none bg-transparent"
-          />
-          <button onClick={() => handleSend()} disabled={!prompt.trim()} className="flex items-center gap-1.5 rounded-lg bg-gray-900 px-3.5 py-2 text-xs font-semibold text-white hover:bg-gray-800 transition-colors shrink-0 disabled:opacity-40">
-            <Send className="h-3.5 w-3.5" />Send
+          <button
+            onClick={() => openWithQuery("Write follow-up texts for unanswered estimates")}
+            className="shrink-0 rounded-xl bg-amber-500 px-3.5 py-2 text-xs font-semibold text-white hover:bg-amber-600 transition-colors"
+          >
+            Write Follow-Ups
           </button>
         </div>
 
-        {/* Prompt chips */}
-        <div className="flex flex-wrap gap-2">
-          {PROMPT_CHIPS.map((chip) => (
-            <button
-              key={chip.label}
-              onClick={() => handleChip(chip)}
-              className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:border-gray-900 hover:text-gray-900 hover:bg-gray-50 transition-colors"
-            >
-              <chip.icon className="h-3 w-3" />
-              {chip.label}
-            </button>
-          ))}
-        </div>
       </div>
-
-      {/* AI Loading */}
-      {loading && (
-        <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6 flex items-center gap-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-900 shrink-0">
-            <Sparkles className="h-5 w-5 text-white" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-gray-900">Pipelly AI is working...</p>
-            <p className="text-xs text-gray-500 mt-0.5">Analyzing your data and preparing results</p>
-          </div>
-          <div className="ml-auto flex items-center gap-1.5">
-            {[0, 1, 2].map((i) => (
-              <span key={i} className="h-2 w-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* AI Result Card — inline in hero */}
-      {!loading && activeResult === "pipeline"    && <InlinePipelineResult    onDismiss={() => setActiveResult(null)} />}
-      {!loading && activeResult === "outreach"    && <InlineOutreachResult    onDismiss={() => setActiveResult(null)} />}
-      {!loading && activeResult === "workspace"   && <InlineWorkspaceResult   onDismiss={() => setActiveResult(null)} />}
-      {!loading && activeResult === "tasks"       && <InlineTasksResult       onDismiss={() => setActiveResult(null)} />}
-      {!loading && activeResult === "automations" && <InlineAutomationsResult onDismiss={() => setActiveResult(null)} />}
-      {!loading && activeResult === "contact"     && <InlineContactResult     onDismiss={() => setActiveResult(null)} />}
-
-      {/* Quick Actions */}
-      {!activeResult && !loading && (
-        <>
-          <div className="mb-7">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-3">AI Actions</p>
-            <div className="grid grid-cols-5 gap-3">
-              {QUICK_ACTIONS.map((a) => (
-                <QuickActionCard key={a.label} {...a} />
-              ))}
-            </div>
-          </div>
-
-          {/* KPIs */}
-          <div className="mb-7">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-3">Performance · Last 30 days</p>
-            <div className="grid grid-cols-6 gap-3">
-              {mockKPIs.map((kpi) => (
-                <div key={kpi.label} className="rounded-xl border border-gray-200 bg-white p-4">
-                  <p className="text-[10px] font-medium uppercase tracking-wide text-gray-400 mb-2">{kpi.label}</p>
-                  <p className="text-xl font-bold text-gray-900 mb-2">{kpi.value}</p>
-                  <div className={cn("flex items-center gap-1 text-xs font-medium", kpi.trend === "up" ? "text-emerald-600" : "text-red-500")}>
-                    {kpi.trend === "up" ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                    {Math.abs(kpi.change)}% vs last mo.
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 3-col layout */}
-          <div className="grid grid-cols-3 gap-5">
-            <div className="col-span-2 flex flex-col gap-5">
-
-              {/* Workspaces */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Active Workspaces</p>
-                  <button className="flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors">
-                    View all <ChevronRight className="h-3 w-3" />
-                  </button>
-                </div>
-                <div className="flex flex-col gap-2">
-                  {mockWorkspaces.slice(0, 4).map((ws) => {
-                    const convRate = Math.round((ws.bookedCalls / ws.leads) * 100);
-                    return (
-                      <div key={ws.id} className="rounded-xl border border-gray-200 bg-white p-4 flex items-center gap-4 hover:border-gray-300 hover:shadow-sm transition-all">
-                        <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white", ws.color)}>
-                          {getInitials(ws.name)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-0.5">
-                            <p className="text-sm font-semibold text-gray-900">{ws.name}</p>
-                            <span className="text-xs text-gray-400">{ws.industry}</span>
-                          </div>
-                          <HealthBar health={ws.health} />
-                        </div>
-                        <div className="flex items-center gap-5 shrink-0 text-center">
-                          {[[ws.leads, "Leads"], [ws.bookedCalls, "Calls"], [`${convRate}%`, "Conv."], [formatCurrency(ws.revenue), "Revenue"]].map(([v, l]) => (
-                            <div key={String(l)}>
-                              <p className="text-sm font-bold text-gray-900">{v}</p>
-                              <p className="text-[10px] text-gray-400">{l}</p>
-                            </div>
-                          ))}
-                        </div>
-                        <Badge className={cn("capitalize border text-[10px] shrink-0", healthColor(ws.health))}>{ws.health}</Badge>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Activity */}
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-3">AI Activity Log</p>
-                <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
-                  {mockAIActivity.map((item) => {
-                    const style = ACTIVITY_STYLES[item.type] ?? { color: "text-gray-600", bg: "bg-gray-50" };
-                    return (
-                      <div key={item.id} className="flex items-center gap-3 px-4 py-3">
-                        <div className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-lg", style.bg)}>
-                          <Sparkles className={cn("h-3.5 w-3.5", style.color)} />
-                        </div>
-                        <p className="flex-1 text-sm text-gray-700">{item.message}</p>
-                        <span className="text-xs text-gray-400 shrink-0">{item.time}</span>
-                        <ArrowRight className="h-3.5 w-3.5 text-gray-300 hover:text-gray-600 transition-colors shrink-0 cursor-pointer" />
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Right */}
-            <div className="col-span-1 flex flex-col gap-5">
-              {/* AI Insights */}
-              <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-                <div className="flex items-center gap-2 px-4 py-3.5 bg-gray-900">
-                  <Sparkles className="h-4 w-4 text-white" />
-                  <p className="text-sm font-semibold text-white flex-1">AI Insights</p>
-                  <span className="flex h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-emerald-900" />
-                </div>
-                <div className="divide-y divide-gray-100">
-                  {mockAISuggestions.map((s) => {
-                    const Icon = s.urgency === "high" ? AlertCircle : s.urgency === "medium" ? Clock : CheckCircle2;
-                    const color = s.urgency === "high" ? "text-red-500" : s.urgency === "medium" ? "text-amber-500" : "text-gray-400";
-                    return (
-                      <div key={s.id} className="px-4 py-3.5">
-                        <div className="flex items-start gap-2.5">
-                          <Icon className={cn("h-3.5 w-3.5 mt-0.5 shrink-0", color)} />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm text-gray-800 leading-snug mb-1.5">{s.message}</p>
-                            <button
-                              onClick={() => openWithQuery(s.action)}
-                              className="flex items-center gap-1 text-xs font-medium text-gray-900 hover:underline underline-offset-2"
-                            >
-                              {s.action} <ArrowRight className="h-3 w-3" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="border-t border-gray-100 px-4 py-3 bg-gray-50">
-                  <button onClick={() => openWithQuery("Analyze my pipeline")} className="flex w-full items-center justify-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors">
-                    <Sparkles className="h-3 w-3" />Ask AI for more insights
-                  </button>
-                </div>
-              </div>
-
-              {/* Today's Focus */}
-              <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-3.5 border-b border-gray-100">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Today&apos;s Focus</p>
-                  <button onClick={() => handleChip({ label: "Generate follow-up tasks", icon: CheckSquare, action: "tasks" })} className="flex items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-gray-900 transition-colors">
-                    <Sparkles className="h-3 w-3" />Refresh
-                  </button>
-                </div>
-                <div className="divide-y divide-gray-100">
-                  {[
-                    { label: "Follow up with Marcus Reid — proposal pending", done: false, priority: "high" },
-                    { label: "Confirm Sophia Chen's demo attendees", done: false, priority: "high" },
-                    { label: "Re-engage 12 cold leads", done: false, priority: "medium" },
-                    { label: "Approve BrightPath automation", done: true, priority: "low" },
-                  ].map((t, i) => (
-                    <div key={i} className="flex items-start gap-3 px-4 py-3">
-                      <div className={cn("mt-0.5 h-4 w-4 shrink-0 rounded-full border-2 flex items-center justify-center", t.done ? "border-emerald-500 bg-emerald-500" : "border-gray-300")}>
-                        {t.done && <CheckCircle2 className="h-3 w-3 text-white" />}
-                      </div>
-                      <p className={cn("text-xs leading-relaxed flex-1", t.done ? "line-through text-gray-400" : "text-gray-700")}>{t.label}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
     </div>
   );
 }
