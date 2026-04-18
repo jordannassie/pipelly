@@ -57,12 +57,12 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
     <aside className="flex h-full w-64 flex-col border-r border-gray-100 bg-white">
       {/* Logo + mobile close */}
       <div className="flex h-16 items-center gap-3 px-5 border-b border-gray-100">
-        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gray-900 flex-shrink-0">
-          <Sparkles className="h-4 w-4 text-white" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-900 flex-shrink-0">
+          <Sparkles className="h-5 w-5 text-white" />
         </div>
         <div className="flex-1">
-          <span className="text-sm font-bold tracking-tight text-gray-900">Pipelly</span>
-          <span className="text-sm font-bold tracking-tight text-gray-400">.ai</span>
+          <span className="text-base font-bold tracking-tight text-gray-900">Pipelly</span>
+          <span className="text-base font-bold tracking-tight text-gray-400">.ai</span>
         </div>
         {onClose && (
           <button
